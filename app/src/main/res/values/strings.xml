@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">iCook</string>
+    <string name="app_label">iCook</string>
+    <string name="search_hint">Search recipe</string>
+    <string name="search_title">Recipe search</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="autocomplete_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete?metaInformation=false</string>
+    <string name="mashape_key">WpyzSYbdxZmshS0aZ4jQ8Uuchk4Op1qqK9jjsnrqHHiYJw7rD5</string>
+</resources>

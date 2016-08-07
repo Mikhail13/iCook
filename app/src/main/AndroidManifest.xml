@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="za.co.mikhails.nanodegree.icook">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <provider
+            android:name="za.co.mikhails.nanodegree.icook.provider.AutocompleteSuggestionProvider"
+            android:authorities="za.co.mikhails.nanodegree.icook.provider.autocomplete"
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="false" />
+
+        <provider
+            android:name=".provider.RecipeContentProvider"
+            android:authorities="za.co.mikhails.nanodegree.icook.app.recipe"
+            android:enabled="true"
+            android:exported="true"
+            android:syncable="true" />
+    </application>
+
+</manifest>
