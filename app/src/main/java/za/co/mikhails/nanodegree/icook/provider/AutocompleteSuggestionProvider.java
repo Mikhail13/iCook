@@ -8,14 +8,22 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import com.squareup.picasso.Picasso;
+
+import za.co.mikhails.nanodegree.icook.R;
 import za.co.mikhails.nanodegree.icook.spoonacular.RestApi;
 
-public class AutocompleteSuggestionProvider  extends ContentProvider {
-    public static final String CONTENT_AUTHORITY = "za.co.mikhails.nanodegree.icook.provider.autocomplete";
-    public static final String PATH_AUTOCOMPLETE = "autocomplete";
-    public static final String AUTOCOMPLETE_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_AUTOCOMPLETE;
+public class AutocompleteSuggestionProvider extends ContentProvider implements AddRowListener {
+    private static final String CONTENT_AUTHORITY = "za.co.mikhails.nanodegree.icook.provider.autocomplete";
+    private static final String PATH_AUTOCOMPLETE = "autocomplete";
+    private static final String AUTOCOMPLETE_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_AUTOCOMPLETE;
+    private static final String ID_COLUMN = "_id";
 
     private RestApi restApi;
+    private final ListCursor listCursor = new ListCursor(new String[]{
+            ID_COLUMN,
+            SearchManager.SUGGEST_COLUMN_TEXT_1});
+//            ,SearchManager.SUGGEST_COLUMN_ICON_1});
 
     public AutocompleteSuggestionProvider() {
     }
@@ -32,7 +40,9 @@ public class AutocompleteSuggestionProvider  extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String query = uri.getLastPathSegment();
         if (!SearchManager.SUGGEST_URI_PATH_QUERY.equals(query)) {
-            return new AutocompleteCursor(restApi.getAutocompleteList(getContext(), query));
+            listCursor.clear();
+            restApi.requestAutocompleteSuggestions(getContext(), listCursor, query, 10);
+            return listCursor;
         }
         return null;
     }
@@ -40,7 +50,7 @@ public class AutocompleteSuggestionProvider  extends ContentProvider {
     @Nullable
     @Override
     public String getType(Uri uri) {
-        return  AUTOCOMPLETE_TYPE;
+        return AUTOCOMPLETE_TYPE;
     }
 
     @Nullable
@@ -57,5 +67,10 @@ public class AutocompleteSuggestionProvider  extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
+    }
+
+    @Override
+    public void addRow(String[] columnValues) {
+        Picasso.with(getContext()).load(getContext().getString(R.string.ingredients_url));
     }
 }
