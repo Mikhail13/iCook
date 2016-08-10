@@ -45,7 +45,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-//        getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
+        getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
         requestRecipeSearch(extras.getString(QUERY), 10);
     }
 
@@ -60,8 +60,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     .appendQueryParameter("number", String.valueOf(limit))
                     .appendQueryParameter("offset", "0")
                     .appendQueryParameter("ranking", "1")
-                    .appendQueryParameter("minCalories", "0")
-                    .appendQueryParameter("maxCalories", "100000")
+//                    .appendQueryParameter("minCalories", "150")
+//                    .appendQueryParameter("maxCalories", "15000")
+                    .appendQueryParameter("minProtein", "5")
+                    .appendQueryParameter("maxProtein", "100")
                     .appendQueryParameter("query", query.trim())
                     .build();
 
@@ -176,7 +178,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return result;
     }
 
-    public static void syncMoviesListImmediately(Context context, String query) {
+    public static void syncRecipeListImmediately(Context context, String query) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
@@ -204,7 +206,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 //        SyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
 
-        syncMoviesListImmediately(context, query);
+        syncRecipeListImmediately(context, query);
     }
 
     public static void initializeSyncAdapter(Context context) {

@@ -21,7 +21,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + SearchResultEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_SEARCH_RESULT_TABLE = "CREATE TABLE " + SearchResultEntry.TABLE_NAME + " (" +
                 SearchResultEntry._ID + " INTEGER PRIMARY KEY," +
                 SearchResultEntry.COLUMN_ID + " INTEGER UNIQUE NOT NULL, " +
                 SearchResultEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
@@ -34,7 +34,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
                 SearchResultEntry.COLUMN_CARBS + " TEXT " +
                 " );";
 
-        sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_SEARCH_RESULT_TABLE);
     }
 
     @Override

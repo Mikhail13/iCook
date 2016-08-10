@@ -7,9 +7,9 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
 
-public class ThemoviedbAuthenticator extends AbstractAccountAuthenticator {
+public class ICookDbAuthenticator extends AbstractAccountAuthenticator {
 
-    public ThemoviedbAuthenticator(Context context) {
+    public ICookDbAuthenticator(Context context) {
         super(context);
     }
 

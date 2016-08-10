@@ -3,5 +3,4 @@
     android:hint="@string/search_hint"
     android:label="@string/app_label"
     android:searchSuggestAuthority="za.co.mikhails.nanodegree.icook.provider.autocomplete"
-    android:searchSuggestThreshold="3"
-    android:searchMode="queryRewriteFromText" />
+    android:searchSuggestThreshold="3" />

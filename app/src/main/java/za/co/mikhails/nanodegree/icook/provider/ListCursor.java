@@ -5,7 +5,7 @@ import android.database.AbstractCursor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListCursor extends AbstractCursor implements AddRowListener {
+public class ListCursor extends AbstractCursor {
     private final String[] columnNames;
     private final List<String[]> list = new ArrayList<>();
 

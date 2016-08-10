@@ -4,13 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-public class ThemoviedbAuthenticatorService extends Service {
+public class ICookDbAuthenticatorService extends Service {
 
-    private ThemoviedbAuthenticator mAuthenticator;
+    private ICookDbAuthenticator mAuthenticator;
 
     @Override
     public void onCreate() {
-        mAuthenticator = new ThemoviedbAuthenticator(this);
+        mAuthenticator = new ICookDbAuthenticator(this);
     }
 
     @Override

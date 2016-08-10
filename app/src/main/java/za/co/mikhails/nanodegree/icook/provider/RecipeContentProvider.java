@@ -82,19 +82,19 @@ public class RecipeContentProvider extends ContentProvider {
         switch (match) {
             case SEARCH_RESULT:
                 db.beginTransaction();
-                int returnMoviesCount = 0;
+                int returnRecipeCount = 0;
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insertWithOnConflict(SearchResultEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_IGNORE);
                         if (_id != -1) {
-                            returnMoviesCount++;
+                            returnRecipeCount++;
                         }
                     }
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
                 }
-                result = returnMoviesCount;
+                result = returnRecipeCount;
                 break;
             default:
                 result = super.bulkInsert(uri, values);
@@ -112,8 +112,21 @@ public class RecipeContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
+        int rowsDeleted;
+        if (null == selection) selection = "1";
+        switch (match) {
+            case SEARCH_RESULT:
+                rowsDeleted = db.delete(SearchResultEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     protected UriMatcher buildUriMatcher() {

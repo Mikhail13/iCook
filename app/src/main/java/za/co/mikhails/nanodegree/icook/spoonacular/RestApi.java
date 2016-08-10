@@ -12,12 +12,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import za.co.mikhails.nanodegree.icook.R;
-import za.co.mikhails.nanodegree.icook.provider.AddRowListener;
+import za.co.mikhails.nanodegree.icook.provider.ListCursor;
 
 public class RestApi {
     private static final String TAG = RestApi.class.getSimpleName();
 
-    public void requestAutocompleteSuggestions(Context context, AddRowListener listener, String query, int limit) {
+    public ListCursor requestAutocompleteSuggestions(Context context, ListCursor listCursor, String query, int limit) {
         HttpURLConnection urlConnection = null;
         JsonReader reader = null;
         try {
@@ -37,25 +37,23 @@ public class RestApi {
             InputStream inputStream = urlConnection.getInputStream();
             reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
 
-            int i = 0;
             if (reader.hasNext()) {
                 reader.beginArray();
                 while (reader.hasNext()) {
                     reader.beginObject();
 
-                    String[] columnValues = new String[3];
-                    columnValues[0] = String.valueOf(i++);
+                    String[] columnValues = new String[2];
                     while (reader.hasNext()) {
                         String name = reader.nextName();
-                        if (name.equals("name")) {
+                        if (name.equals("id")) {
+                            columnValues[0] = reader.nextString();
+                        } else if (name.equals("title")) {
                             columnValues[1] = reader.nextString();
-                        } else if (name.equals("image")) {
-                            columnValues[2] = reader.nextString();
                         } else {
                             reader.skipValue();
                         }
                     }
-                    listener.addRow(columnValues);
+                    listCursor.addRow(columnValues);
                     reader.endObject();
                 }
                 reader.endArray();
@@ -75,6 +73,7 @@ public class RestApi {
                 }
             }
         }
+        return listCursor;
     }
 
 }
