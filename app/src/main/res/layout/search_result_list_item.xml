@@ -6,16 +6,16 @@
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="240px"
-        android:layout_height="150px"
+        android:layout_width="@dimen/search_result_image_width"
+        android:layout_height="@dimen/search_result_image_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/no_image"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/title"
+        style="@style/SearchResultPrimaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -25,43 +25,95 @@
         android:layout_toRightOf="@+id/image" />
 
     <TextView
-        android:id="@+id/calories"
+        android:id="@+id/calories_title"
+        style="@style/SearchResultSecondaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@+id/image"
-        android:layout_toRightOf="@+id/image" />
+        android:layout_toRightOf="@+id/image"
+        android:text="@string/calories" />
+
+    <TextView
+        android:id="@+id/calories"
+        style="@style/SearchResultSecondaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/calories_title"
+        android:layout_toRightOf="@+id/calories_title" />
+
+    <TextView
+        android:id="@+id/protein_title"
+        style="@style/SearchResultSecondaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/calories_title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:text="@string/protein" />
 
     <TextView
         android:id="@+id/protein"
+        style="@style/SearchResultSecondaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/calories_title"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_toEndOf="@+id/calories"
-        android:layout_toRightOf="@+id/calories" />
+        android:layout_toEndOf="@+id/protein_title"
+        android:layout_toRightOf="@+id/protein_title" />
+
+    <TextView
+        android:id="@+id/fat_title"
+        style="@style/SearchResultSecondaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/protein_title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:text="@string/fat" />
 
     <TextView
         android:id="@+id/fat"
+        style="@style/SearchResultSecondaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/protein_title"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_toEndOf="@+id/protein"
-        android:layout_toRightOf="@+id/protein" />
+        android:layout_toEndOf="@+id/fat_title"
+        android:layout_toRightOf="@+id/fat_title" />
+
+    <TextView
+        android:id="@+id/carbs_title"
+        style="@style/SearchResultSecondaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fat_title"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:text="@string/carbs" />
 
     <TextView
         android:id="@+id/carbs"
+        style="@style/SearchResultSecondaryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/fat_title"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:layout_toEndOf="@+id/fat"
-        android:layout_toRightOf="@+id/fat" />
+        android:layout_toEndOf="@+id/carbs_title"
+        android:layout_toRightOf="@+id/carbs_title" />
 
 </RelativeLayout>

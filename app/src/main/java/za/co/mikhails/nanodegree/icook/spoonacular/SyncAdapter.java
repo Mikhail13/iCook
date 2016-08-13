@@ -52,30 +52,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public boolean requestRecipeSearch(String query, int limit) {
         boolean result = false;
 
-        HttpURLConnection urlConnection = null;
-        JsonReader reader = null;
-        try {
-            Uri builtUri = Uri.parse(getContext().getString(R.string.search_url)).buildUpon()
-                    .appendQueryParameter("limitLicense", "false")
-                    .appendQueryParameter("number", String.valueOf(limit))
-                    .appendQueryParameter("offset", "0")
-                    .appendQueryParameter("ranking", "1")
-//                    .appendQueryParameter("minCalories", "150")
-//                    .appendQueryParameter("maxCalories", "15000")
-                    .appendQueryParameter("minProtein", "5")
-                    .appendQueryParameter("maxProtein", "100")
-                    .appendQueryParameter("query", query.trim())
-                    .build();
+        if (query != null && query.trim().length() > 0) {
+            HttpURLConnection urlConnection = null;
+            JsonReader reader = null;
+            try {
+                Uri builtUri = Uri.parse(getContext().getString(R.string.search_url)).buildUpon()
+                        .appendQueryParameter("limitLicense", "false")
+                        .appendQueryParameter("number", String.valueOf(limit))
+                        .appendQueryParameter("offset", "0")
+                        .appendQueryParameter("ranking", "1")
+                        .appendQueryParameter("minCalories", "0")
+                        .appendQueryParameter("maxCalories", "15000")
+                        .appendQueryParameter("includeIngredients", "all")
+                        .appendQueryParameter("query", query.trim())
+                        .build();
 
-            URL url = new URL(builtUri.toString());
-            Log.d(TAG, "URL: " + url.toString());
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("X-Mashape-Key", getContext().getString(R.string.mashape_key));
-            urlConnection.setRequestProperty("Accept", "application/json");
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+                URL url = new URL(builtUri.toString());
+                Log.d(TAG, "URL: " + url.toString());
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("X-Mashape-Key", getContext().getString(R.string.mashape_key));
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
 
-            InputStream inputStream = urlConnection.getInputStream();
+                InputStream inputStream = urlConnection.getInputStream();
 
 //            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 //            StringBuilder out = new StringBuilder();
@@ -86,22 +86,23 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 //            Log.d(TAG, "requestRecipeSearch: " + out.toString());
 //            bufferedReader.close();
 //
-            reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
 
-            parseResultValues(reader);
-            result = true;
+                parseResultValues(reader);
+                result = true;
 
-        } catch (Exception e) {
-            Log.e(TAG, "Error ", e);
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
+            } catch (Exception e) {
+                Log.e(TAG, "Error ", e);
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(TAG, "Error closing stream", e);
+                    }
                 }
             }
         }

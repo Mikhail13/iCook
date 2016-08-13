@@ -7,10 +7,26 @@
     <string name="content_authority">za.co.mikhails.nanodegree.icook.provider.searchresult</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <!--<string name="autocomplete_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete?metaInformation=false</string>-->
+    <!--<string name="autocomplete_ingredients_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete?metaInformation=false</string>-->
     <string name="autocomplete_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete</string>
     <string name="search_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex</string>
     <string name="ingredients_url">https://spoonacular.com/cdn/ingredients_100x100/</string>
+    <string name="search_result_default_image_url">http://spoonacular.com/recipeImages/275104-</string>
     <string name="mashape_key">WpyzSYbdxZmshS0aZ4jQ8Uuchk4Op1qqK9jjsnrqHHiYJw7rD5</string>
+
+    <string name="calories">Calories:</string>
+    <string name="protein">Protein:</string>
+    <string name="fat">Fat:</string>
+    <string name="carbs">Carbs:</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="my_email">sukharuchkinm@gmail.com</string>
+    <string name="nav_header_title">iCook App (Capstone Stage2)</string>
+    <string name="nav_advanced_search">Advanced Search</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_shopping_list">Shopping List</string>
 
 </resources>

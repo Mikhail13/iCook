@@ -11,23 +11,25 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class SearchResultAdapter extends CursorAdapter {
-    public static final int COLUMN_ID = 1;
-    public static final int COLUMN_TITLE = 2;
-    public static final int COLUMN_IMAGE = 3;
-    public static final int COLUMN_IMAGE_TYPE = 4;
-    public static final int COLUMN_IMAGE_BASE_URL = 5;
-    public static final int COLUMN_CALORIES = 6;
-    public static final int COLUMN_PROTEIN = 7;
-    public static final int COLUMN_FAT = 8;
-    public static final int COLUMN_CARBS = 9;
+class SearchResultAdapter extends CursorAdapter {
+    private static final int COLUMN_ID = 1;
+    private static final int COLUMN_TITLE = 2;
+    //    private static final int COLUMN_IMAGE = 3;
+    private static final int COLUMN_IMAGE_TYPE = 4;
+    private static final int COLUMN_IMAGE_BASE_URL = 5;
+    private static final int COLUMN_CALORIES = 6;
+    private static final int COLUMN_PROTEIN = 7;
+    private static final int COLUMN_FAT = 8;
+    private static final int COLUMN_CARBS = 9;
+    private String imageWidthXHeight;
 
-    public SearchResultAdapter(Context context, Cursor c, boolean autoRequery) {
-        super(context, c, autoRequery);
+    SearchResultAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+        init(context);
     }
 
-    public SearchResultAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+    private void init(Context context) {
+        imageWidthXHeight = String.valueOf(context.getResources().getDimensionPixelSize(R.dimen.search_result_image_width) + "x" + context.getResources().getDimensionPixelSize(R.dimen.search_result_image_height));
     }
 
     @Override
@@ -48,8 +50,14 @@ public class SearchResultAdapter extends CursorAdapter {
         String id = cursor.getString(COLUMN_ID);
         String imageType = cursor.getString(COLUMN_IMAGE_TYPE);
         String imageBaseUrl = cursor.getString(COLUMN_IMAGE_BASE_URL);
+        if (id == null || id.length() == 0 ||
+                imageBaseUrl == null || imageBaseUrl.length() == 0 ||
+                imageType == null) {
+            String url = context.getString(R.string.search_result_default_image_url) + imageWidthXHeight;
+            Picasso.with(context).load(url).into(imageView);
+        }
         if (id != null && imageType != null && imageBaseUrl != null) {
-            String url = imageBaseUrl + id + "-240x150." + imageType;
+            String url = imageBaseUrl + id + "-" + imageWidthXHeight + (imageType.length() > 0 ? "." + imageType : "");
             Picasso.with(context).load(url).into(imageView);
         }
 
@@ -68,7 +76,7 @@ public class SearchResultAdapter extends CursorAdapter {
         textView = (TextView) view.getTag(R.id.LIST_ITEM_CARBS);
         textView.setText(cursor.getString(COLUMN_CARBS));
 
-        view.setTag(R.id.RECIPE_ID, cursor.getInt(COLUMN_ID));
+        view.setTag(R.id.RECIPE_ID, id);
     }
 
 }
