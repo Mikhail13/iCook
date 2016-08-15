@@ -28,14 +28,14 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
     private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
     private Cursor cursor;
-    private String recipeId;
+    private long recipeId;
     private View rootView;
     private ActionBar supportActionBar;
-    private ImageView photoView;
+    private ImageView imageView;
 
-    public static Fragment newInstance(String recipeId) {
+    public static Fragment newInstance(long recipeId) {
         Bundle arguments = new Bundle();
-        arguments.putString(RecipeDetailsActivity.RECIPE_ID, recipeId);
+        arguments.putLong(RecipeDetailsActivity.RECIPE_ID, recipeId);
         RecipeDetailsFragment fragment = new RecipeDetailsFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -46,7 +46,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(RecipeDetailsActivity.RECIPE_ID)) {
-            recipeId = getArguments().getString(RecipeDetailsActivity.RECIPE_ID);
+            recipeId = getArguments().getLong(RecipeDetailsActivity.RECIPE_ID);
         }
     }
 
@@ -70,7 +70,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             }
         });
 
-        photoView = (ImageView) rootView.findViewById(R.id.photo);
+        imageView = (ImageView) rootView.findViewById(R.id.toolbar_image);
 
 //        rootView.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -93,17 +93,20 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
         TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
 
-        if (cursor != null && cursor.getCount() > 0) {
+        if (cursor != null) {
             rootView.setAlpha(0);
             rootView.setVisibility(View.VISIBLE);
             rootView.animate().alpha(1);
 
             String titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
+            String desctiptionText = cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION);
+            String toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
+
             if (supportActionBar != null) {
                 supportActionBar.setTitle(titleText);
             }
-            description.setText(Html.fromHtml(cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION)));
-            Picasso.with(getContext()).load(cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL)).into(photoView);
+            description.setText(Html.fromHtml(desctiptionText));
+            Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
 
         } else {
             rootView.setVisibility(View.GONE);
@@ -136,7 +139,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         if (this.cursor != null) {
             Log.d(TAG, "onLoadFinished: " + cursor.getNotificationUri().toString());
 
-            if (!this.cursor.moveToFirst()) {
+            if (this.cursor.moveToFirst()) {
                 bindViews();
             } else {
                 Log.e(TAG, "Error reading item detail cursor");

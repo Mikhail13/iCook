@@ -23,8 +23,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_SEARCH_RESULT_TABLE = "CREATE TABLE " + SearchResultEntry.TABLE_NAME + " (" +
-                SearchResultEntry._ID + " INTEGER PRIMARY KEY," +
-                SearchResultEntry.COLUMN_RECIPE_ID + " INTEGER UNIQUE NOT NULL, " +
+                SearchResultEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 SearchResultEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 SearchResultEntry.COLUMN_IMAGE + " TEXT, " +
                 SearchResultEntry.COLUMN_IMAGE_TYPE + " TEXT, " +
@@ -38,8 +37,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_SEARCH_RESULT_TABLE);
 
         final String SQL_CREATE_RECIPE_TABLE = "CREATE TABLE " + RecipeEntry.TABLE_NAME + " (" +
-                RecipeEntry._ID + " INTEGER PRIMARY KEY," +
-                RecipeEntry.COLUMN_RECIPE_ID + " INTEGER UNIQUE NOT NULL, " +
+                RecipeEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 RecipeEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 RecipeEntry.COLUMN_DESCRIPTION + " TEXT, " +
                 RecipeEntry.COLUMN_IMAGE_URL + " TEXT " +
@@ -51,6 +49,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + SearchResultEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + RecipeEntry.TABLE_NAME);
         onCreate(db);
     }
 }

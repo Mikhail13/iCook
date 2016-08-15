@@ -15,6 +15,7 @@ public class RecipeContract {
 
     public static final String PATH_SEARCH_RESULT = "search_result";
     public static final String PATH_RECIPE_DETAILS = "details";
+    public static final String PATH_RECIPE = PATH_RECIPE_DETAILS + "/#";
 
     public static final class SearchResultEntry implements BaseColumns {
 
@@ -24,7 +25,6 @@ public class RecipeContract {
         public static final String TABLE_NAME = "search_result";
 
         public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_RECIPE_ID = "id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_IMAGE = "image";
         public static final String COLUMN_IMAGE_TYPE = "image_type";
@@ -53,7 +53,6 @@ public class RecipeContract {
         public static final String TABLE_NAME = "recipe";
 
         public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_RECIPE_ID = "id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_IMAGE_URL = "image_url";
@@ -62,8 +61,8 @@ public class RecipeContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildItemUri(String recipeId) {
-            return ContentUris.withAppendedId(CONTENT_URI, Long.parseLong(recipeId));
+        public static Uri buildItemUri(long recipeId) {
+            return ContentUris.withAppendedId(CONTENT_URI, recipeId);
         }
     }
 

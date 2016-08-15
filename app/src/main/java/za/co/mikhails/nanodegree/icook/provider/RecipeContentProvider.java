@@ -33,6 +33,9 @@ public class RecipeContentProvider extends ContentProvider {
         switch (uriMatcher.match(uri)) {
             case SEARCH_RESULT:
                 return SearchResultEntry.CONTENT_TYPE;
+            case RECIPE_DETAILS:
+            case RECIPE:
+                return RecipeEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -75,8 +78,8 @@ public class RecipeContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
-            case RECIPE:
-                itemId = db.insert(RecipeEntry.TABLE_NAME, null, values);
+            case RECIPE_DETAILS:
+                itemId = db.insertWithOnConflict(RecipeEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (itemId > 0) {
                     returnUri = RecipeEntry.buildResultUri(itemId);
                 } else {
@@ -151,7 +154,7 @@ public class RecipeContentProvider extends ContentProvider {
 
         matcher.addURI(authority, RecipeContract.PATH_SEARCH_RESULT, SEARCH_RESULT);
         matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS, RECIPE);
-        matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS + "/#", RECIPE_DETAILS);
+        matcher.addURI(authority, RecipeContract.PATH_RECIPE, RECIPE_DETAILS);
 
         return matcher;
     }

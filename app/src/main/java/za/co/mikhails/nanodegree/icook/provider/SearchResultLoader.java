@@ -16,8 +16,7 @@ public class SearchResultLoader extends CursorLoader {
 
     public interface Query {
         String[] PROJECTION = {
-                RecipeContract.SearchResultEntry._ID,
-                RecipeContract.SearchResultEntry.COLUMN_RECIPE_ID,
+                RecipeContract.SearchResultEntry.COLUMN_ID,
                 RecipeContract.SearchResultEntry.COLUMN_TITLE,
                 RecipeContract.SearchResultEntry.COLUMN_IMAGE,
                 RecipeContract.SearchResultEntry.COLUMN_IMAGE_TYPE,
@@ -28,15 +27,14 @@ public class SearchResultLoader extends CursorLoader {
                 RecipeContract.SearchResultEntry.COLUMN_CARBS
         };
 
-        int _ID = 0;
-        int RECIPE_ID = 1;
-        int TITLE = 2;
-        int IMAGE = 3;
-        int IMAGE_TYPE = 4;
-        int IMAGE_BASE_URL = 5;
-        int CALORIES = 6;
-        int PROTEIN = 7;
-        int FAT = 8;
-        int CARBS = 9;
+        int ID = 0;
+        int TITLE = 1;
+        int IMAGE = 2;
+        int IMAGE_TYPE = 3;
+        int IMAGE_BASE_URL = 4;
+        int CALORIES = 5;
+        int PROTEIN = 6;
+        int FAT = 7;
+        int CARBS = 8;
     }
 }

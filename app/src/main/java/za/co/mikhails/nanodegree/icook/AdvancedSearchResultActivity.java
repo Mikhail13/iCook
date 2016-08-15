@@ -48,8 +48,9 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
             mAdView.loadAd(adRequest);
         }
 
-        progressIndicator = findViewById(R.id.progress_indicator);
-        searchResult.setEmptyView(progressIndicator);
+//        progressIndicator = findViewById(R.id.progress_indicator);
+//        searchResult.setEmptyView(progressIndicator);
+        searchResult.setEmptyView(findViewById(R.id.empty_view));
 
 
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);

@@ -1,5 +1,6 @@
 package za.co.mikhails.nanodegree.icook;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -23,6 +24,7 @@ class SearchResultAdapter extends CursorAdapter {
         init(context);
     }
 
+    @SuppressLint("StringFormatMatches")
     private void init(Context context) {
         secondaryText = context.getString(R.string.list_item_search_result_secondary_text, null);
         imageWidthXHeight = String.valueOf(context.getResources().getDimensionPixelSize(R.dimen.search_result_image_width) + "x" + context.getResources().getDimensionPixelSize(R.dimen.search_result_image_height));
@@ -40,16 +42,14 @@ class SearchResultAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.getTag(R.id.LIST_ITEM_IMAGE);
-        String id = cursor.getString(SearchResultLoader.Query.RECIPE_ID);
+        long id = cursor.getLong(SearchResultLoader.Query.ID);
         String imageType = cursor.getString(SearchResultLoader.Query.IMAGE_TYPE);
         String imageBaseUrl = cursor.getString(SearchResultLoader.Query.IMAGE_BASE_URL);
-        if (id == null || id.length() == 0 ||
-                imageBaseUrl == null || imageBaseUrl.length() == 0 ||
+        if (imageBaseUrl == null || imageBaseUrl.length() == 0 ||
                 imageType == null || imageType.equals("webp")) {
             String url = context.getString(R.string.search_result_default_image_url) + imageWidthXHeight;
             Picasso.with(context).load(url).into(imageView);
-        }
-        if (id != null && imageType != null && imageBaseUrl != null) {
+        } else {
             String url = imageBaseUrl + id + "-" + imageWidthXHeight + (imageType.length() > 0 ? "." + imageType : "");
             Picasso.with(context).load(url).into(imageView);
         }

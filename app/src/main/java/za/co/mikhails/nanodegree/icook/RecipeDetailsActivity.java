@@ -16,7 +16,7 @@ public class RecipeDetailsActivity extends AppCompatActivity {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        String recipeId = getIntent().getStringExtra(RECIPE_ID);
+        long recipeId = getIntent().getLongExtra(RECIPE_ID, -1);
         fragmentTransaction.add(R.id.fragment_container, RecipeDetailsFragment.newInstance(recipeId));
         fragmentTransaction.commit();
     }

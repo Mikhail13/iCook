@@ -30,7 +30,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = SyncAdapter.class.getSimpleName();
 
     public static final String NEXT_PAGE = "nextpage";
-    public static final String RECIPE = "recipe";
+    public static final String RECIPE_ID = "recipe_id";
     public static final String QUERY = "query";
     public static final String QUERY_ADVANCED = "query_advanced";
 
@@ -65,25 +65,26 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
-        if (extras.containsKey(RECIPE)) {
-            requestRecipeDetails(extras.getString(RECIPE));
+        if (extras.containsKey(RECIPE_ID)) {
+            requestRecipeDetails(extras.getLong(RECIPE_ID, -1));
         } else if (extras.containsKey(QUERY)) {
+            getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
             requestQuickSearch(extras.getString(QUERY), 10);
         } else if (extras.containsKey(QUERY_ADVANCED)) {
+            getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
             requestAdvancedSearch(extras, 10);
         }
     }
 
-    public boolean requestRecipeDetails(String recipeId) {
+    public boolean requestRecipeDetails(long recipeId) {
         boolean result = false;
 
-        if (recipeId != null && recipeId.trim().length() > 0) {
+        if (recipeId != -1) {
             HttpURLConnection urlConnection = null;
             JsonReader reader = null;
             try {
                 Uri builtUri = Uri.parse(getContext().getString(R.string.recipe_details_url)).buildUpon()
-                        .appendPath(recipeId)
+                        .appendPath(String.valueOf(recipeId))
                         .appendPath("summary")
 //                        .appendPath("information")
 //                        .appendQueryParameter("includeNutrition", "false")
@@ -253,7 +254,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             while (reader.hasNext()) {
                 String name = reader.nextName();
                 if (name.equals("id")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_RECIPE_ID, reader.nextLong());
+                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
                 } else if (name.equals("title")) {
                     resultValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
                 } else if (name.equals("summary")) {
@@ -306,7 +307,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         while (reader.hasNext()) {
             String name = reader.nextName();
             if (name.equals("id")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_RECIPE_ID, reader.nextLong());
+                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_ID, reader.nextLong());
             } else if (name.equals("title")) {
                 resultValues.put(RecipeContract.SearchResultEntry.COLUMN_TITLE, reader.nextString());
             } else if (name.equals("image")) {
@@ -333,7 +334,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Uri result = null;
         if (resultList.size() > 0) {
             result = getContext().getContentResolver().insert(
-                    RecipeContract.RecipeEntry.CONTENT_URI, resultList);
+                    RecipeContract.RecipeEntry.buildItemUri(resultList.getAsLong(RecipeContract.RecipeEntry.COLUMN_ID)), resultList);
         }
         return result;
     }
@@ -348,13 +349,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return result;
     }
 
-    public static void syncRecipeDetailsImmediately(Context context, String recipeId) {
+    public static void syncRecipeDetailsImmediately(Context context, long recipeId) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        if (recipeId != null) {
-            bundle.putString(RECIPE, recipeId);
-        }
+        bundle.putLong(RECIPE_ID, recipeId);
+
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
     }

@@ -98,12 +98,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mAdView.loadAd(adRequest);
         }
 
-        progressIndicator = findViewById(R.id.progress_indicator);
-
-        searchResult.setEmptyView(progressIndicator);
-
-//        progressIndicator.setVisibility(View.VISIBLE);
-//        searchResult.setAlpha(0.5f);
+//        progressIndicator = findViewById(R.id.progress_indicator);
+//        searchResult.setEmptyView(progressIndicator);
+        searchResult.setEmptyView(findViewById(R.id.empty_view));
 
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
     }
@@ -250,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String recipeId = (String) view.getTag(R.id.RECIPE_ID);
+        long recipeId = (Long) view.getTag(R.id.RECIPE_ID);
         Log.d(TAG, "onItemClick: " + recipeId);
 
         Intent intent = new Intent(this, RecipeDetailsActivity.class);
