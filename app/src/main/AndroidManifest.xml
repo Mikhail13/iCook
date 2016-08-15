@@ -15,9 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTop"
+            android:name="za.co.mikhails.nanodegree.icook.MainActivity"
             android:label="@string/app_label"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,19 +32,19 @@
         </activity>
 
         <provider
-            android:name=".provider.AutocompleteSuggestionProvider"
+            android:name="za.co.mikhails.nanodegree.icook.provider.AutocompleteSuggestionProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.autocomplete"
             android:enabled="true"
             android:exported="false"
-            android:syncable="false" />
+            android:syncable="true" />
         <provider
-            android:name=".provider.RecipeContentProvider"
-            android:authorities="za.co.mikhails.nanodegree.icook.provider.searchresult"
+            android:name="za.co.mikhails.nanodegree.icook.provider.RecipeContentProvider"
+            android:authorities="za.co.mikhails.nanodegree.icook.provider.recipe"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:syncable="true" />
 
-        <service android:name=".spoonacular.ICookDbAuthenticatorService">
+        <service android:name="za.co.mikhails.nanodegree.icook.spoonacular.ICookDbAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -54,7 +54,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".spoonacular.ICookDbSyncService"
+            android:name="za.co.mikhails.nanodegree.icook.spoonacular.ICookDbSyncService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -65,6 +65,32 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <activity
+            android:name="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity"
+            android:label="@string/advanced_search_label"
+            android:launchMode="singleTask"
+            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name="za.co.mikhails.nanodegree.icook.AdvancedSearchResultActivity"
+            android:label="@string/advanced_search_label"
+            android:parentActivityName="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity" />
+        </activity>
+        <activity
+            android:name="za.co.mikhails.nanodegree.icook.RecipeDetailsActivity"
+            android:label="@string/title_activity_recipe_details"
+            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -19,7 +19,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/search_result_main" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="?android:attr/actionBarSize">
+
+        <include layout="@layout/search_result" />
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -2,9 +2,6 @@
 <resources>
     <item name="LIST_ITEM_IMAGE" type="id" />
     <item name="LIST_ITEM_TITLE" type="id" />
-    <item name="LIST_ITEM_CALORIES" type="id" />
-    <item name="LIST_ITEM_PROTEIN" type="id" />
-    <item name="LIST_ITEM_FAT" type="id" />
-    <item name="LIST_ITEM_CARBS" type="id" />
+    <item name="LIST_ITEM_SECONDARY_TEXT" type="id" />
     <item name="RECIPE_ID" type="id" />
 </resources>

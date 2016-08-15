@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">iCook</string>
     <string name="app_label">iCook</string>
+    <string name="advanced_search_label">Advanced Search</string>
     <string name="search_hint">Quick recipe search</string>
     <string name="search_title">Quick search</string>
     <string name="sync_account_type">icook.nanodegree.mikhails.co.za</string>
-    <string name="content_authority">za.co.mikhails.nanodegree.icook.provider.searchresult</string>
+    <string name="content_authority">za.co.mikhails.nanodegree.icook.provider.recipe</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <!--<string name="autocomplete_ingredients_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete?metaInformation=false</string>-->
@@ -12,12 +13,10 @@
     <string name="search_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex</string>
     <string name="ingredients_url">https://spoonacular.com/cdn/ingredients_100x100/</string>
     <string name="search_result_default_image_url">http://spoonacular.com/recipeImages/275104-</string>
+    <string name="recipe_details_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes</string>
     <string name="mashape_key">WpyzSYbdxZmshS0aZ4jQ8Uuchk4Op1qqK9jjsnrqHHiYJw7rD5</string>
 
-    <string name="calories">Calories:</string>
-    <string name="protein">Protein:</string>
-    <string name="fat">Fat:</string>
-    <string name="carbs">Carbs:</string>
+    <string name="list_item_search_result_secondary_text">Calories %%s  Protein %%s  Fat %%s  Carbs %%s</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -28,5 +27,8 @@
     <string name="nav_advanced_search">Advanced Search</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_shopping_list">Shopping List</string>
+
+    <string name="adv_search_meal_type">Select Meal Type...</string>
+    <string name="title_activity_recipe_details">Recipe Details</string>
 
 </resources>

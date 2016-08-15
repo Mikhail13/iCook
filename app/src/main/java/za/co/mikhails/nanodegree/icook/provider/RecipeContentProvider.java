@@ -7,10 +7,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
 import za.co.mikhails.nanodegree.icook.provider.RecipeContract.SearchResultEntry;
 
 public class RecipeContentProvider extends ContentProvider {
     private static final int SEARCH_RESULT = 100;
+    private static final int RECIPE = 200;
+    private static final int RECIPE_DETAILS = 300;
 
     protected UriMatcher uriMatcher;
     private RecipeDbHelper dbHelper;
@@ -44,6 +47,10 @@ public class RecipeContentProvider extends ContentProvider {
                 retCursor = dbHelper.getReadableDatabase().query(SearchResultEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case RECIPE_DETAILS:
+                retCursor = dbHelper.getReadableDatabase().query(RecipeEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -57,12 +64,21 @@ public class RecipeContentProvider extends ContentProvider {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int match = uriMatcher.match(uri);
         Uri returnUri;
+        long itemId;
 
         switch (match) {
             case SEARCH_RESULT:
-                long itemId = db.insert(SearchResultEntry.TABLE_NAME, null, values);
+                itemId = db.insert(SearchResultEntry.TABLE_NAME, null, values);
                 if (itemId > 0) {
-                    returnUri = SearchResultEntry.buildSearchResultUri(itemId);
+                    returnUri = SearchResultEntry.buildResultUri(itemId);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            case RECIPE:
+                itemId = db.insert(RecipeEntry.TABLE_NAME, null, values);
+                if (itemId > 0) {
+                    returnUri = RecipeEntry.buildResultUri(itemId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -134,6 +150,8 @@ public class RecipeContentProvider extends ContentProvider {
         final String authority = RecipeContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, RecipeContract.PATH_SEARCH_RESULT, SEARCH_RESULT);
+        matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS, RECIPE);
+        matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS + "/#", RECIPE_DETAILS);
 
         return matcher;
     }

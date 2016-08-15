@@ -1,0 +1,154 @@
+package za.co.mikhails.nanodegree.icook;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
+import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import za.co.mikhails.nanodegree.icook.provider.RecipeDetailsLoader;
+import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
+
+public class RecipeDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
+    private Cursor cursor;
+    private String recipeId;
+    private View rootView;
+    private ActionBar supportActionBar;
+    private ImageView photoView;
+
+    public static Fragment newInstance(String recipeId) {
+        Bundle arguments = new Bundle();
+        arguments.putString(RecipeDetailsActivity.RECIPE_ID, recipeId);
+        RecipeDetailsFragment fragment = new RecipeDetailsFragment();
+        fragment.setArguments(arguments);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments().containsKey(RecipeDetailsActivity.RECIPE_ID)) {
+            recipeId = getArguments().getString(RecipeDetailsActivity.RECIPE_ID);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_recipe_details, container, false);
+
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        supportActionBar = activity.getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Activity activity = RecipeDetailsFragment.this.getActivity();
+                NavUtils.navigateUpTo(activity, new Intent(activity, MainActivity.class));
+            }
+        });
+
+        photoView = (ImageView) rootView.findViewById(R.id.photo);
+
+//        rootView.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+//                        .setType("text/plain")
+//                        .setText("Some sample text")
+//                        .getIntent(), getString(R.string.action_share)));
+//            }
+//        });
+
+        bindViews();
+        return rootView;
+    }
+
+    private void bindViews() {
+        if (rootView == null) {
+            return;
+        }
+
+        TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            rootView.setAlpha(0);
+            rootView.setVisibility(View.VISIBLE);
+            rootView.animate().alpha(1);
+
+            String titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
+            if (supportActionBar != null) {
+                supportActionBar.setTitle(titleText);
+            }
+            description.setText(Html.fromHtml(cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION)));
+            Picasso.with(getContext()).load(cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL)).into(photoView);
+
+        } else {
+            rootView.setVisibility(View.GONE);
+            description.setText("N/A");
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        SyncAdapter.syncRecipeDetailsImmediately(getContext(), recipeId);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return RecipeDetailsLoader.newInstanceForItemId(getActivity(), recipeId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        if (!isAdded()) {
+            if (cursor != null) {
+                cursor.close();
+            }
+            return;
+        }
+
+        this.cursor = cursor;
+        if (this.cursor != null) {
+            Log.d(TAG, "onLoadFinished: " + cursor.getNotificationUri().toString());
+
+            if (!this.cursor.moveToFirst()) {
+                bindViews();
+            } else {
+                Log.e(TAG, "Error reading item detail cursor");
+                this.cursor.close();
+                this.cursor = null;
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        cursor = null;
+        bindViews();
+    }
+}

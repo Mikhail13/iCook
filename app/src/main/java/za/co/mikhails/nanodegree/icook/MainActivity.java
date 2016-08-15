@@ -7,7 +7,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -24,15 +23,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract;
+import za.co.mikhails.nanodegree.icook.provider.SearchResultLoader;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int SEARCH_RESULT_LOADER = 1;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_quick_search);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,10 +84,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 ////            startActivity(intentShowLocal);
 //        }
 
-        progressIndicator = findViewById(R.id.progress_indicator);
         searchResult = (ListView) findViewById(R.id.search_result);
         searchResultAdapter = new SearchResultAdapter(this, null, 0);
         searchResult.setAdapter(searchResultAdapter);
+        searchResult.setOnItemSelectedListener(this);
+        searchResult.setOnItemClickListener(this);
 
         AdView mAdView = (AdView) findViewById(R.id.ad_banner);
         if (mAdView != null) {
@@ -96,6 +97,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     .build();
             mAdView.loadAd(adRequest);
         }
+
+        progressIndicator = findViewById(R.id.progress_indicator);
+
+        searchResult.setEmptyView(progressIndicator);
+
+//        progressIndicator.setVisibility(View.VISIBLE);
+//        searchResult.setAlpha(0.5f);
 
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
     }
@@ -116,15 +124,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void searchQuery(String query) {
         Log.d(TAG, "searchQuery: [" + query + "]");
 
+//        progressIndicator.setVisibility(View.VISIBLE);
+//        searchResult.setAlpha(0.5f);
+
         SyncAdapter.syncRecipeListImmediately(this, query);
 
 //        Bundle bundle = new Bundle();
 //        bundle.putString(SEARCH_QUERY, query);
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
-    }
-
-    public void showProgressIndicator(boolean show) {
-        progressIndicator.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -146,12 +153,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         if (id == SEARCH_RESULT_LOADER) {
-            Uri baseContentUri = RecipeContract.BASE_CONTENT_URI;
-            Uri.Builder builder = baseContentUri.buildUpon()
-                    .appendPath(RecipeContract.PATH_SEARCH_RESULT);
-//                    .appendQueryParameter("query", query);
-//            ContentUris.appendId(builder, query);
-            searchResultLoader = new CursorLoader(this, builder.build(), null, null, null, null);
+            searchResultLoader = SearchResultLoader.newLoaderInstance(this);
             return searchResultLoader;
         }
         return null;
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader == searchResultLoader) {
+
             searchResultAdapter.swapCursor(data);
 
             // TODO: Save/restore list view state
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_advanced_search) {
-
+            startActivity(new Intent(this, AdvancedSearchActivity.class));
         } else if (id == R.id.nav_faforites) {
 
         } else if (id == R.id.nav_shopping_list) {
@@ -234,5 +237,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        onItemClick(parent, view, position, id);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String recipeId = (String) view.getTag(R.id.RECIPE_ID);
+        Log.d(TAG, "onItemClick: " + recipeId);
+
+        Intent intent = new Intent(this, RecipeDetailsActivity.class);
+        intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
+        startActivity(intent);
     }
 }
