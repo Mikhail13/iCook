@@ -10,21 +10,15 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import za.co.mikhails.nanodegree.icook.R;
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract;
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.IngredientEntry;
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.SearchResultEntry;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = SyncAdapter.class.getSimpleName();
@@ -34,24 +28,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String QUERY = "query";
     public static final String QUERY_ADVANCED = "query_advanced";
 
-    public static final String PARAM_TYPE = "type";
-    public static final String PARAM_CUISINE = "cuisine";
-    public static final String PARAM_DIET = "diet";
-    public static final String PARAM_INTOLERANCES = "intolerances";
-    public static final String PARAM_MIN_CALORIES = "minCalories";
-    public static final String PARAM_MAX_CALORIES = "maxCalories";
-    public static final String PARAM_MIN_CARBS = "minCarbs";
-    public static final String PARAM_MAX_CARBS = "maxCarbs";
-    public static final String PARAM_MIN_FAT = "minFat";
-    public static final String PARAM_MAX_FAT = "maxFat";
-    public static final String PARAM_MIN_PROTEIN = "minProtein";
-    public static final String PARAM_MAX_PROTEIN = "maxProtein";
-    public static final String PARAM_INCLUDE_INGREDIENTS = "includeIngredients";
-    public static final String PARAM_EXCLUDE_INGREDIENTS = "excludeIngredients";
-
     private int mTotalPages = 1;
     private int mLastPage = 0;
-    private String baseUrl = null;
+    private SpoonacularApi spoonacularApi = new SpoonacularApi();
 
     //TODO: load next page on scroll
 
@@ -65,276 +44,78 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+
         if (extras.containsKey(RECIPE_ID)) {
-            requestRecipeDetails(extras.getLong(RECIPE_ID, -1));
+
+            long recipeId = extras.getLong(RECIPE_ID, -1);
+            if (recipeId != -1) {
+                ContentValues contentValues = spoonacularApi.requestRecipeSummary(getContext(), recipeId);
+                if (contentValues != null) {
+                    Uri inserted = insertRecipeDataIntoContentProvider(contentValues);
+                    Log.d(TAG, "Inserted uri [" + inserted + "]");
+                }
+
+                Map<String, Object> map = spoonacularApi.requestRecipeDetails(getContext(), recipeId);
+                ContentValues recipeValues = (ContentValues) map.get(SpoonacularApi.INGREDIENT_LIST);
+                List<ContentValues> ingredientList = (List<ContentValues>) map.get(SpoonacularApi.RECIPE_VALUES);
+
+                if (recipeValues != null) {
+                    int updated = updateRecipeDataIntoContentProvider(recipeValues);
+                    Log.d(TAG, "Updated [" + updated + "] records");
+                }
+
+                if (ingredientList != null) {
+                    int inserted = insertIngredientsDataIntoContentProvider(ingredientList);
+                    Log.d(TAG, "Inserted [" + inserted + "] records");
+                }
+            }
+
         } else if (extras.containsKey(QUERY)) {
-            getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
-            requestQuickSearch(extras.getString(QUERY), 10);
+
+            getContext().getContentResolver().delete(SearchResultEntry.CONTENT_URI, null, null);
+            List<ContentValues> contentValuesList = spoonacularApi.requestQuickSearch(getContext(), extras.getString(QUERY), 10);
+            if (contentValuesList != null) {
+                int inserted = insertSearchResultDataIntoContentProvider(contentValuesList);
+                Log.d(TAG, "Inserted [" + inserted + "] records");
+            }
+
         } else if (extras.containsKey(QUERY_ADVANCED)) {
-            getContext().getContentResolver().delete(RecipeContract.SearchResultEntry.CONTENT_URI, null, null);
-            requestAdvancedSearch(extras, 10);
-        }
-    }
 
-    public boolean requestRecipeDetails(long recipeId) {
-        boolean result = false;
-
-        if (recipeId != -1) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri builtUri = Uri.parse(getContext().getString(R.string.recipe_details_url)).buildUpon()
-                        .appendPath(String.valueOf(recipeId))
-                        .appendPath("summary")
-//                        .appendPath("information")
-//                        .appendQueryParameter("includeNutrition", "false")
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", getContext().getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-//            StringBuilder out = new StringBuilder();
-//            String line;
-//            while ((line = bufferedReader.readLine()) != null) {
-//                out.append(line);
-//            }
-//            Log.d(TAG, "requestQuickSearch: " + out.toString());
-//            bufferedReader.close();
-
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-
-                parseRecipeSummaryValues(reader);
-                result = true;
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
+            getContext().getContentResolver().delete(SearchResultEntry.CONTENT_URI, null, null);
+            List<ContentValues> contentValuesList = spoonacularApi.requestAdvancedSearch(getContext(), extras, 10);
+            if (contentValuesList != null) {
+                int inserted = insertSearchResultDataIntoContentProvider(contentValuesList);
+                Log.d(TAG, "Inserted [" + inserted + "] records");
             }
+
         }
-        return result;
-    }
-
-
-    public boolean requestQuickSearch(String query, int limit) {
-        boolean result = false;
-
-        if (query != null && query.trim().length() > 0) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri builtUri = Uri.parse(getContext().getString(R.string.search_url)).buildUpon()
-                        .appendQueryParameter("limitLicense", "false")
-                        .appendQueryParameter("number", String.valueOf(limit))
-                        .appendQueryParameter("offset", "0")
-                        .appendQueryParameter("ranking", "1")
-                        .appendQueryParameter("minCalories", "0")
-                        .appendQueryParameter("maxCalories", "15000")
-                        .appendQueryParameter("includeIngredients", "all")
-                        .appendQueryParameter("query", query.trim())
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", getContext().getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                parseResultValues(reader);
-                result = true;
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public boolean requestAdvancedSearch(Bundle bundle, int limit) {
-        boolean result = false;
-
-        if (bundle != null) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri.Builder builder = Uri.parse(getContext().getString(R.string.search_url)).buildUpon()
-                        .appendQueryParameter("limitLicense", "false")
-                        .appendQueryParameter("number", String.valueOf(limit))
-                        .appendQueryParameter("offset", "0")
-                        .appendQueryParameter("ranking", "1");
-                appendQueryParameter(builder, PARAM_TYPE, bundle);
-                appendQueryParameter(builder, PARAM_CUISINE, bundle);
-                appendQueryParameter(builder, PARAM_DIET, bundle);
-                appendQueryParameter(builder, PARAM_INTOLERANCES, bundle);
-                appendQueryParameter(builder, PARAM_MIN_CALORIES, bundle);
-                appendQueryParameter(builder, PARAM_MAX_CALORIES, bundle);
-                appendQueryParameter(builder, PARAM_MIN_CARBS, bundle);
-                appendQueryParameter(builder, PARAM_MAX_CARBS, bundle);
-                appendQueryParameter(builder, PARAM_MIN_FAT, bundle);
-                appendQueryParameter(builder, PARAM_MAX_FAT, bundle);
-                appendQueryParameter(builder, PARAM_MIN_PROTEIN, bundle);
-                appendQueryParameter(builder, PARAM_MAX_PROTEIN, bundle);
-                appendQueryParameter(builder, PARAM_INCLUDE_INGREDIENTS, bundle);
-                appendQueryParameter(builder, PARAM_EXCLUDE_INGREDIENTS, bundle);
-
-                URL url = new URL(builder.build().toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", getContext().getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                parseResultValues(reader);
-                result = true;
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    private void appendQueryParameter(Uri.Builder builder, String paramName, Bundle bundle) {
-        if (bundle.containsKey(paramName)) {
-            builder.appendQueryParameter(paramName, bundle.getString(paramName));
-        }
-    }
-
-    private void parseRecipeSummaryValues(JsonReader reader) throws IOException {
-        if (reader.hasNext()) {
-
-            reader.beginObject();
-            ContentValues resultValues = new ContentValues();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                if (name.equals("id")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
-                } else if (name.equals("title")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
-                } else if (name.equals("summary")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_DESCRIPTION, reader.nextString());
-                } else {
-                    reader.skipValue();
-                }
-            }
-            reader.endObject();
-
-            Uri inserted = insertRecipeDataIntoContentProvider(resultValues);
-            Log.d(TAG, "Inserted [" + inserted + "] results");
-        }
-    }
-
-    private void parseResultValues(JsonReader reader) throws IOException {
-        while (reader.hasNext()) {
-            List<ContentValues> resultList = new ArrayList();
-
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                if (name.equals("results") && reader.peek() != JsonToken.NULL) {
-                    reader.beginArray();
-                    while (reader.hasNext()) {
-                        resultList.add(parseContentValues(reader));
-                    }
-                    reader.endArray();
-                } else if (name.equals("baseUri")) {
-                    baseUrl = reader.nextString();
-                } else {
-                    reader.skipValue();
-                }
-            }
-            if (baseUrl != null) {
-                for (ContentValues contentValues : resultList) {
-                    contentValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE_BASE_URL, baseUrl);
-                }
-            }
-            int inserted = insertSearchResultDataIntoContentProvider(resultList);
-            Log.d(TAG, "Inserted [" + inserted + "] results");
-        }
-    }
-
-    @NonNull
-    private ContentValues parseContentValues(JsonReader reader) throws IOException {
-        reader.beginObject();
-
-        ContentValues resultValues = new ContentValues();
-        while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("id")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_ID, reader.nextLong());
-            } else if (name.equals("title")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_TITLE, reader.nextString());
-            } else if (name.equals("image")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE, reader.nextString());
-            } else if (name.equals("imageType")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE_TYPE, reader.nextString());
-            } else if (name.equals("calories")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CALORIES, reader.nextString());
-            } else if (name.equals("protein")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_PROTEIN, reader.nextString());
-            } else if (name.equals("fat")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_FAT, reader.nextString());
-            } else if (name.equals("carbs")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CARBS, reader.nextString());
-            } else {
-                reader.skipValue();
-            }
-        }
-        reader.endObject();
-        return resultValues;
     }
 
     private Uri insertRecipeDataIntoContentProvider(ContentValues resultList) {
         Uri result = null;
         if (resultList.size() > 0) {
             result = getContext().getContentResolver().insert(
-                    RecipeContract.RecipeEntry.buildItemUri(resultList.getAsLong(RecipeContract.RecipeEntry.COLUMN_ID)), resultList);
+                    RecipeEntry.buildItemUri(resultList.getAsLong(RecipeEntry.COLUMN_ID)), resultList);
+        }
+        return result;
+    }
+
+    private int updateRecipeDataIntoContentProvider(ContentValues resultList) {
+        int result = 0;
+        if (resultList.size() > 0) {
+            result = getContext().getContentResolver().update(
+                    RecipeEntry.buildItemUri(resultList.getAsLong(RecipeEntry.COLUMN_ID)), resultList,
+                    RecipeEntry.COLUMN_ID + "=?", new String[]{resultList.getAsString(RecipeEntry.COLUMN_ID)});
+        }
+        return result;
+    }
+
+    private int insertIngredientsDataIntoContentProvider(List<ContentValues> resultList) {
+        int result = 0;
+        if (resultList.size() > 0) {
+            result = getContext().getContentResolver().bulkInsert(
+                    IngredientEntry.CONTENT_URI,
+                    resultList.toArray(new ContentValues[resultList.size()]));
         }
         return result;
     }
@@ -343,7 +124,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         int result = 0;
         if (resultList.size() > 0) {
             result = getContext().getContentResolver().bulkInsert(
-                    RecipeContract.SearchResultEntry.CONTENT_URI,
+                    SearchResultEntry.CONTENT_URI,
                     resultList.toArray(new ContentValues[resultList.size()]));
         }
         return result;

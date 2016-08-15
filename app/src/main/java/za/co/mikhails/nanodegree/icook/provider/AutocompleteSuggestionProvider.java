@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import za.co.mikhails.nanodegree.icook.spoonacular.RestApi;
+import za.co.mikhails.nanodegree.icook.spoonacular.SpoonacularApi;
 
 public class AutocompleteSuggestionProvider extends ContentProvider {
     private static final String TAG = AutocompleteSuggestionProvider.class.getSimpleName();
@@ -20,14 +20,14 @@ public class AutocompleteSuggestionProvider extends ContentProvider {
     private static final String ID_COLUMN = "_id";
     private static final int DEFAULT_LIMIT = 10;
 
-    private RestApi restApi;
+    private SpoonacularApi spoonacularApi;
 
     public AutocompleteSuggestionProvider() {
     }
 
     @Override
     public boolean onCreate() {
-        restApi = new RestApi();
+        spoonacularApi = new SpoonacularApi();
 
         return true;
     }
@@ -50,7 +50,7 @@ public class AutocompleteSuggestionProvider extends ContentProvider {
             }
 
             ListCursor listCursor = new ListCursor(new String[]{ID_COLUMN, SearchManager.SUGGEST_COLUMN_TEXT_1});
-            return restApi.requestAutocompleteSuggestions(getContext(), listCursor, query, limit);
+            return spoonacularApi.requestAutocompleteSuggestions(getContext(), listCursor, query, limit);
         }
         return null;
     }

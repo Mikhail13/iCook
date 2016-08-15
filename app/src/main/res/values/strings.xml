@@ -13,7 +13,7 @@
     <string name="search_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex</string>
     <string name="ingredients_url">https://spoonacular.com/cdn/ingredients_100x100/</string>
     <string name="search_result_default_image_url">http://spoonacular.com/recipeImages/275104-</string>
-    <string name="recipe_details_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes</string>
+    <string name="recipe_summary_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes</string>
     <string name="mashape_key">WpyzSYbdxZmshS0aZ4jQ8Uuchk4Op1qqK9jjsnrqHHiYJw7rD5</string>
 
     <string name="list_item_search_result_secondary_text">Calories %%s  Protein %%s  Fat %%s  Carbs %%s</string>

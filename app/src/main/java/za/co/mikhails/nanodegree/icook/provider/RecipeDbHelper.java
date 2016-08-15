@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.IngredientEntry;
 import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
 import za.co.mikhails.nanodegree.icook.provider.RecipeContract.SearchResultEntry;
 
@@ -40,16 +41,31 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
                 RecipeEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
                 RecipeEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 RecipeEntry.COLUMN_DESCRIPTION + " TEXT, " +
-                RecipeEntry.COLUMN_IMAGE_URL + " TEXT " +
+                RecipeEntry.COLUMN_IMAGE_URL + " TEXT, " +
+                RecipeEntry.COLUMN_READY_IN + " TEXT, " +
+                RecipeEntry.COLUMN_PERCENT_PROTEIN + " TEXT, " +
+                RecipeEntry.COLUMN_PERCENT_FAT + " TEXT, " +
+                RecipeEntry.COLUMN_PERCENT_CARBS + " TEXT " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_RECIPE_TABLE);
+
+        final String SQL_CREATE_INGREDIENT_TABLE = "CREATE TABLE " + IngredientEntry.TABLE_NAME + " (" +
+                IngredientEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                IngredientEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                IngredientEntry.COLUMN_IMAGE + " TEXT, " +
+                IngredientEntry.COLUMN_AMOUNT + " TEXT, " +
+                IngredientEntry.COLUMN_UNIT + " TEXT " +
+                " );";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_INGREDIENT_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + SearchResultEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + RecipeEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + IngredientEntry.TABLE_NAME);
         onCreate(db);
     }
 }

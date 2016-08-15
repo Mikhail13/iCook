@@ -7,13 +7,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import za.co.mikhails.nanodegree.icook.provider.RecipeContract.IngredientEntry;
 import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
 import za.co.mikhails.nanodegree.icook.provider.RecipeContract.SearchResultEntry;
 
 public class RecipeContentProvider extends ContentProvider {
+
+    private static final String TAG = RecipeContentProvider.class.getSimpleName();
+
     private static final int SEARCH_RESULT = 100;
     private static final int RECIPE = 200;
     private static final int RECIPE_DETAILS = 300;
+    private static final int INGREDIENTS = 400;
 
     protected UriMatcher uriMatcher;
     private RecipeDbHelper dbHelper;
@@ -36,6 +41,8 @@ public class RecipeContentProvider extends ContentProvider {
             case RECIPE_DETAILS:
             case RECIPE:
                 return RecipeEntry.CONTENT_TYPE;
+            case INGREDIENTS:
+                return IngredientEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -52,6 +59,10 @@ public class RecipeContentProvider extends ContentProvider {
                 break;
             case RECIPE_DETAILS:
                 retCursor = dbHelper.getReadableDatabase().query(RecipeEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case INGREDIENTS:
+                retCursor = dbHelper.getReadableDatabase().query(IngredientEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
@@ -86,6 +97,14 @@ public class RecipeContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
+            case INGREDIENTS:
+                itemId = db.insertWithOnConflict(IngredientEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                if (itemId > 0) {
+                    returnUri = IngredientEntry.buildResultUri(itemId);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -114,6 +133,22 @@ public class RecipeContentProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 result = returnRecipeCount;
+                break;
+            case INGREDIENTS:
+                db.beginTransaction();
+                int returnIngredientCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insertWithOnConflict(IngredientEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
+                        if (_id != -1) {
+                            returnIngredientCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                result = returnIngredientCount;
                 break;
             default:
                 result = super.bulkInsert(uri, values);
@@ -155,6 +190,7 @@ public class RecipeContentProvider extends ContentProvider {
         matcher.addURI(authority, RecipeContract.PATH_SEARCH_RESULT, SEARCH_RESULT);
         matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS, RECIPE);
         matcher.addURI(authority, RecipeContract.PATH_RECIPE, RECIPE_DETAILS);
+        matcher.addURI(authority, RecipeContract.PATH_INGREDIENT, INGREDIENTS);
 
         return matcher;
     }

@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
+import za.co.mikhails.nanodegree.icook.spoonacular.SpoonacularApi;
 
 public class AdvancedSearchActivity extends AppCompatActivity {
 
@@ -73,20 +73,20 @@ public class AdvancedSearchActivity extends AppCompatActivity {
     }
 
     private void saveInputValues(Bundle valuesBundle) {
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_TYPE, R.id.meal_type);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_CUISINE, R.id.cuisine);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_DIET, R.id.diet);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_INTOLERANCES, R.id.intolerances);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MIN_CALORIES, R.id.min_calories);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MAX_CALORIES, R.id.max_calories);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MIN_CARBS, R.id.min_carbs);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MAX_CARBS, R.id.max_carbs);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MIN_FAT, R.id.min_fat);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MAX_FAT, R.id.max_fat);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MIN_PROTEIN, R.id.min_protein);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_MAX_PROTEIN, R.id.max_protein);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_INCLUDE_INGREDIENTS, R.id.include_ingredients);
-        addBundleValue(valuesBundle, SyncAdapter.PARAM_EXCLUDE_INGREDIENTS, R.id.exclude_ingredients);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_TYPE, R.id.meal_type);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_CUISINE, R.id.cuisine);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_DIET, R.id.diet);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_INTOLERANCES, R.id.intolerances);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MIN_CALORIES, R.id.min_calories);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MAX_CALORIES, R.id.max_calories);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MIN_CARBS, R.id.min_carbs);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MAX_CARBS, R.id.max_carbs);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MIN_FAT, R.id.min_fat);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MAX_FAT, R.id.max_fat);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MIN_PROTEIN, R.id.min_protein);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_MAX_PROTEIN, R.id.max_protein);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_INCLUDE_INGREDIENTS, R.id.include_ingredients);
+        addBundleValue(valuesBundle, SpoonacularApi.PARAM_EXCLUDE_INGREDIENTS, R.id.exclude_ingredients);
     }
 
     private void addBundleValue(Bundle bundle, String paramKey, int resId) {

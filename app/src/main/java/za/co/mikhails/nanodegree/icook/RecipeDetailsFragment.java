@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 public class RecipeDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
-    private Cursor cursor;
     private long recipeId;
     private View rootView;
     private ActionBar supportActionBar;
@@ -82,21 +80,11 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 //            }
 //        });
 
-        bindViews();
         return rootView;
     }
 
-    private void bindViews() {
-        if (rootView == null) {
-            return;
-        }
-
-        TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
-
-        if (cursor != null) {
-            rootView.setAlpha(0);
-            rootView.setVisibility(View.VISIBLE);
-            rootView.animate().alpha(1);
+    private void bindViews(Cursor cursor) {
+        if (rootView != null) {
 
             String titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
             String desctiptionText = cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION);
@@ -105,12 +93,11 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             if (supportActionBar != null) {
                 supportActionBar.setTitle(titleText);
             }
-            description.setText(Html.fromHtml(desctiptionText));
-            Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
 
-        } else {
-            rootView.setVisibility(View.GONE);
-            description.setText("N/A");
+            TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
+            description.setText(Html.fromHtml(desctiptionText));
+
+            Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
         }
     }
 
@@ -123,35 +110,17 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return RecipeDetailsLoader.newInstanceForItemId(getActivity(), recipeId);
+        return RecipeDetailsLoader.newInstanceForItemId(getContext(), recipeId);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if (!isAdded()) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            return;
-        }
-
-        this.cursor = cursor;
-        if (this.cursor != null) {
-            Log.d(TAG, "onLoadFinished: " + cursor.getNotificationUri().toString());
-
-            if (this.cursor.moveToFirst()) {
-                bindViews();
-            } else {
-                Log.e(TAG, "Error reading item detail cursor");
-                this.cursor.close();
-                this.cursor = null;
-            }
+        if (isAdded() && cursor != null && cursor.moveToFirst()) {
+            bindViews(cursor);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        cursor = null;
-        bindViews();
     }
 }
