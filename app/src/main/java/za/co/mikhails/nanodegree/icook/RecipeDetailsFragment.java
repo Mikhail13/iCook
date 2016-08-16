@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -29,6 +30,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     private long recipeId;
     private View rootView;
     private ActionBar supportActionBar;
+    private CollapsingToolbarLayout toolbarLayout;
     private ImageView imageView;
 
     public static Fragment newInstance(long recipeId) {
@@ -68,6 +70,8 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             }
         });
 
+        toolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.toolbar_layout);
+
         imageView = (ImageView) rootView.findViewById(R.id.toolbar_image);
 
 //        rootView.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
@@ -90,14 +94,14 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             String desctiptionText = cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION);
             String toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
 
-            if (supportActionBar != null) {
-                supportActionBar.setTitle(titleText);
-            }
+            toolbarLayout.setTitle(titleText);
 
             TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
             description.setText(Html.fromHtml(desctiptionText));
 
-            Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
+            if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
+                Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
+            }
         }
     }
 

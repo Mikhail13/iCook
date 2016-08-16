@@ -79,6 +79,7 @@ public class RecipeContract {
         public static final String TABLE_NAME = "ingredient";
 
         public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_RECIPE_ID = "recipe_id";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_IMAGE = "image";
         public static final String COLUMN_AMOUNT = "amount";

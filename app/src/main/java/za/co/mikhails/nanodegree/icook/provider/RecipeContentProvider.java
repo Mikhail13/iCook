@@ -160,8 +160,20 @@ public class RecipeContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
+        int updated = 0;
+        switch (match) {
+            case RECIPE_DETAILS:
+                updated = db.update(RecipeEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (updated > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return updated;
     }
 
     @Override
@@ -177,7 +189,7 @@ public class RecipeContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if (rowsDeleted != 0) {
+        if (rowsDeleted > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;

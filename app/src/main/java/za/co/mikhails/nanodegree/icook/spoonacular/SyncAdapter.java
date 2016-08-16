@@ -56,8 +56,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 }
 
                 Map<String, Object> map = spoonacularApi.requestRecipeDetails(getContext(), recipeId);
-                ContentValues recipeValues = (ContentValues) map.get(SpoonacularApi.INGREDIENT_LIST);
-                List<ContentValues> ingredientList = (List<ContentValues>) map.get(SpoonacularApi.RECIPE_VALUES);
+                List<ContentValues> ingredientList = (List<ContentValues>) map.get(SpoonacularApi.INGREDIENT_LIST);
+                ContentValues recipeValues = (ContentValues) map.get(SpoonacularApi.RECIPE_VALUES);
 
                 if (recipeValues != null) {
                     int updated = updateRecipeDataIntoContentProvider(recipeValues);
