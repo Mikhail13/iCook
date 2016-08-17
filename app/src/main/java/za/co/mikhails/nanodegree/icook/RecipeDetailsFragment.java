@@ -5,21 +5,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import za.co.mikhails.nanodegree.icook.provider.RecipeDetailsLoader;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
@@ -69,10 +67,14 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
                 NavUtils.navigateUpTo(activity, new Intent(activity, MainActivity.class));
             }
         });
+        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
+        viewPager.setAdapter(new RecipeDetailsPagerAdapter(getContext()));
+        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
 
         toolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.toolbar_layout);
 
-        imageView = (ImageView) rootView.findViewById(R.id.toolbar_image);
+//        imageView = (ImageView) rootView.findViewById(R.id.toolbar_image);
 
 //        rootView.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -96,12 +98,12 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
             toolbarLayout.setTitle(titleText);
 
-            TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
-            description.setText(Html.fromHtml(desctiptionText));
+//            TextView description = (TextView) rootView.findViewById(R.id.recipe_description);
+//            description.setText(Html.fromHtml(desctiptionText));
 
-            if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
-                Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
-            }
+//            if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
+//                Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
+//            }
         }
     }
 
