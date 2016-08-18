@@ -6,8 +6,9 @@
     <TextView
         android:id="@+id/recipe_description"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
+        android:text="This is test"
         android:background="#3300ff00" />
 
 </FrameLayout>

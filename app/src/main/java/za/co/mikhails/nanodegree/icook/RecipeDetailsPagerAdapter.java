@@ -9,28 +9,32 @@ import android.widget.TextView;
 
 public class RecipeDetailsPagerAdapter extends PagerAdapter {
     private Context context;
+    private LayoutInflater layoutInflater;
+    private String[] titles = new String[]{"Summary", "Ingredients", "Instructions", "Nutrition"};
 
     public RecipeDetailsPagerAdapter(Context context) {
         this.context = context;
+        layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return 2;
+        return titles.length;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return position == 0 ? "Tab 1" : "Tab 2";
+        return titles[position];
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = LayoutInflater.from(context).inflate(R.layout.details_page_summary, container, false);
+
+        View view = layoutInflater.inflate(R.layout.details_page_summary, container, false);
         TextView textView = (TextView) view.findViewById(R.id.recipe_description);
         textView.setText("Tab " + position);
         container.addView(view);
-        return textView;
+        return view;
     }
 
 

@@ -9,12 +9,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -67,10 +69,37 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
                 NavUtils.navigateUpTo(RecipeDetailsActivity.this, new Intent(RecipeDetailsActivity.this, MainActivity.class));
             }
         });
-        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setAdapter(new RecipeDetailsPagerAdapter(this));
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+                switch (tab.getPosition()) {
+                    case 0:
+                        showToast("One");
+                        break;
+                    case 1:
+                        showToast("Two");
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.nested_scroll_view);
+        nestedScrollView.setFillViewport(true);
 
         toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 
@@ -86,6 +115,11 @@ public class RecipeDetailsActivity extends AppCompatActivity implements LoaderMa
 //            }
 //        });
 
+    }
+
+    private void showToast(String text) {
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     private void bindViews(Cursor cursor) {
