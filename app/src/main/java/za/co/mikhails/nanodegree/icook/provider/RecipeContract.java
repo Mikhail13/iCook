@@ -17,6 +17,7 @@ public class RecipeContract {
     public static final String PATH_RECIPE_DETAILS = "details";
     public static final String PATH_RECIPE = PATH_RECIPE_DETAILS + "/#";
     public static final String PATH_INGREDIENT = "ingredient";
+    public static final String PATH_INGREDIENT_LIST = "ingredient_list";
 
     public static final class SearchResultEntry implements BaseColumns {
 
@@ -74,6 +75,7 @@ public class RecipeContract {
     public static final class IngredientEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_INGREDIENT).build();
+        public static final Uri CONTENT_LIST_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_INGREDIENT_LIST).build();
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INGREDIENT;
 
         public static final String TABLE_NAME = "ingredient";

@@ -8,7 +8,7 @@ import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
 
 public class RecipeDetailsLoader extends CursorLoader {
 
-    public static RecipeDetailsLoader newInstanceForItemId(Context context, long recipeId) {
+    public static RecipeDetailsLoader newInstanceForRecipeId(Context context, long recipeId) {
         String selection = RecipeEntry.COLUMN_ID + "=?";
         String[] selectionArgs = {String.valueOf(recipeId)};
         return new RecipeDetailsLoader(context, RecipeEntry.buildItemUri(recipeId), selection, selectionArgs);

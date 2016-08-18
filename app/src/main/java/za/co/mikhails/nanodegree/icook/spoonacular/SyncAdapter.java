@@ -65,7 +65,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 }
 
                 if (ingredientList != null) {
-                    int inserted = insertIngredientsDataIntoContentProvider(ingredientList);
+                    int inserted = insertIngredientsDataIntoContentProvider(ingredientList, recipeId);
                     Log.d(TAG, "Inserted [" + inserted + "] records");
                 }
             }
@@ -110,9 +110,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return result;
     }
 
-    private int insertIngredientsDataIntoContentProvider(List<ContentValues> resultList) {
+    private int insertIngredientsDataIntoContentProvider(List<ContentValues> resultList, long recipeId) {
         int result = 0;
         if (resultList.size() > 0) {
+            for (ContentValues contentValues : resultList) {
+                contentValues.put(IngredientEntry.COLUMN_RECIPE_ID, recipeId);
+            }
             result = getContext().getContentResolver().bulkInsert(
                     IngredientEntry.CONTENT_URI,
                     resultList.toArray(new ContentValues[resultList.size()]));

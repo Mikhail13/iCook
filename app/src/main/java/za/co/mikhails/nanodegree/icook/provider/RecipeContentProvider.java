@@ -18,7 +18,8 @@ public class RecipeContentProvider extends ContentProvider {
     private static final int SEARCH_RESULT = 100;
     private static final int RECIPE = 200;
     private static final int RECIPE_DETAILS = 300;
-    private static final int INGREDIENTS = 400;
+    private static final int INGREDIENT = 400;
+    private static final int INGREDIENT_LIST = 500;
 
     protected UriMatcher uriMatcher;
     private RecipeDbHelper dbHelper;
@@ -41,7 +42,7 @@ public class RecipeContentProvider extends ContentProvider {
             case RECIPE_DETAILS:
             case RECIPE:
                 return RecipeEntry.CONTENT_TYPE;
-            case INGREDIENTS:
+            case INGREDIENT:
                 return IngredientEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -61,7 +62,8 @@ public class RecipeContentProvider extends ContentProvider {
                 retCursor = dbHelper.getReadableDatabase().query(RecipeEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
-            case INGREDIENTS:
+            case INGREDIENT:
+            case INGREDIENT_LIST:
                 retCursor = dbHelper.getReadableDatabase().query(IngredientEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
@@ -97,7 +99,7 @@ public class RecipeContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
-            case INGREDIENTS:
+            case INGREDIENT:
                 itemId = db.insertWithOnConflict(IngredientEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (itemId > 0) {
                     returnUri = IngredientEntry.buildResultUri(itemId);
@@ -134,7 +136,7 @@ public class RecipeContentProvider extends ContentProvider {
                 }
                 result = returnRecipeCount;
                 break;
-            case INGREDIENTS:
+            case INGREDIENT:
                 db.beginTransaction();
                 int returnIngredientCount = 0;
                 try {
@@ -202,7 +204,8 @@ public class RecipeContentProvider extends ContentProvider {
         matcher.addURI(authority, RecipeContract.PATH_SEARCH_RESULT, SEARCH_RESULT);
         matcher.addURI(authority, RecipeContract.PATH_RECIPE_DETAILS, RECIPE);
         matcher.addURI(authority, RecipeContract.PATH_RECIPE, RECIPE_DETAILS);
-        matcher.addURI(authority, RecipeContract.PATH_INGREDIENT, INGREDIENTS);
+        matcher.addURI(authority, RecipeContract.PATH_INGREDIENT, INGREDIENT);
+        matcher.addURI(authority, RecipeContract.PATH_INGREDIENT_LIST, INGREDIENT_LIST);
 
         return matcher;
     }

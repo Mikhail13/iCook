@@ -52,6 +52,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_INGREDIENT_TABLE = "CREATE TABLE " + IngredientEntry.TABLE_NAME + " (" +
                 IngredientEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                IngredientEntry.COLUMN_RECIPE_ID + " INTEGER NOT NULL, " +
                 IngredientEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 IngredientEntry.COLUMN_IMAGE + " TEXT, " +
                 IngredientEntry.COLUMN_AMOUNT + " TEXT, " +

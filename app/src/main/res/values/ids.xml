@@ -4,4 +4,5 @@
     <item name="LIST_ITEM_TITLE" type="id" />
     <item name="LIST_ITEM_SECONDARY_TEXT" type="id" />
     <item name="RECIPE_ID" type="id" />
+    <item name="INGREDIENT_ID" type="id" />
 </resources>
