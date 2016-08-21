@@ -32,13 +32,13 @@
         </activity>
 
         <provider
-            android:name="za.co.mikhails.nanodegree.icook.provider.AutocompleteSuggestionProvider"
+            android:name="za.co.mikhails.nanodegree.icook.data.AutocompleteSuggestionProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.autocomplete"
             android:enabled="true"
             android:exported="false"
             android:syncable="true" />
         <provider
-            android:name="za.co.mikhails.nanodegree.icook.provider.RecipeContentProvider"
+            android:name="za.co.mikhails.nanodegree.icook.data.RecipeContentProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.recipe"
             android:enabled="true"
             android:exported="false"
@@ -87,6 +87,22 @@
             android:label="@string/title_activity_recipe_details"
             android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+        </activity>
+        <activity
+            android:name="za.co.mikhails.nanodegree.icook.FavoritesActivity"
+            android:label="@string/title_activity_favorites_details"
+            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+        </activity>
+        <activity
+            android:name="za.co.mikhails.nanodegree.icook.ShoppingListActivity"
+            android:label="@string/title_activity_shopping_list"
+            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.MainActivity" />

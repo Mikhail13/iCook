@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import za.co.mikhails.nanodegree.icook.provider.SearchResultLoader;
+import za.co.mikhails.nanodegree.icook.data.SearchResultLoader;
 
 class SearchResultAdapter extends CursorAdapter {
 

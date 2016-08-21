@@ -1,10 +1,10 @@
-package za.co.mikhails.nanodegree.icook.provider;
+package za.co.mikhails.nanodegree.icook.data;
 
 import android.content.Context;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract.IngredientEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.IngredientEntry;
 
 public class IngredientsListLoader extends CursorLoader {
 

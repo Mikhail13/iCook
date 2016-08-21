@@ -9,9 +9,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,16 +21,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import za.co.mikhails.nanodegree.icook.provider.SearchResultLoader;
+import za.co.mikhails.nanodegree.icook.data.SearchResultLoader;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener,
+        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int SEARCH_RESULT_LOADER = 1;
@@ -52,15 +53,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -70,25 +62,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-//        Intent intent = getIntent();
-//        String action = intent.getAction();
-//        if (Intent.ACTION_SEARCH.equals(action)) {
-//            String query = intent.getStringExtra(SearchManager.QUERY);
-//            searchQuery("potato");
-//        } else if (Intent.ACTION_VIEW.equals(action)) {
-//            Log.d(TAG, "Intent.ACTION_VIEW: intent.getData(): " + intent.getData());
-////            handles a click on a search suggestion; launches activity to show word
-////            Intent intentShowLocal = new Intent(this, DetailsLocalActivity.class);
-////            intentShowLocal.setData(intent.getData());
-////            startActivity(intentShowLocal);
-//        }
-
         searchResult = (ListView) findViewById(R.id.search_result);
         searchResultAdapter = new SearchResultAdapter(this, null, 0);
         searchResult.setAdapter(searchResultAdapter);
         searchResult.setOnItemSelectedListener(this);
         searchResult.setOnItemClickListener(this);
+        searchResult.setOnScrollListener(this);
+        searchResult.setEmptyView(findViewById(R.id.empty_view));
 
         AdView mAdView = (AdView) findViewById(R.id.ad_banner);
         if (mAdView != null) {
@@ -97,10 +77,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     .build();
             mAdView.loadAd(adRequest);
         }
-
-//        progressIndicator = findViewById(R.id.progress_indicator);
-//        searchResult.setEmptyView(progressIndicator);
-        searchResult.setEmptyView(findViewById(R.id.empty_view));
 
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
     }
@@ -121,13 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void searchQuery(String query) {
         Log.d(TAG, "searchQuery: [" + query + "]");
 
-//        progressIndicator.setVisibility(View.VISIBLE);
-//        searchResult.setAlpha(0.5f);
-
         SyncAdapter.syncRecipeListImmediately(this, query);
-
-//        Bundle bundle = new Bundle();
-//        bundle.putString(SEARCH_QUERY, query);
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
     }
 
@@ -135,9 +105,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
-
-//      TODO: decide on Setting menu
-//        getMenuInflater().inflate(R.menu.main_menu, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem menuItem = menu.findItem(R.id.menu_search);
@@ -206,17 +173,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -226,9 +188,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (id == R.id.nav_advanced_search) {
             startActivity(new Intent(this, AdvancedSearchActivity.class));
         } else if (id == R.id.nav_faforites) {
-
+            startActivity(new Intent(this, FavoritesActivity.class));
         } else if (id == R.id.nav_shopping_list) {
-
+            startActivity(new Intent(this, ShoppingListActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -252,6 +214,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         Intent intent = new Intent(this, RecipeDetailsActivity.class);
         intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
+        intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
         startActivity(intent);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (totalItemCount - visibleItemCount < firstVisibleItem + visibleItemCount) {
+            SyncAdapter.loadNextPageOnScroll(this);
+        }
     }
 }

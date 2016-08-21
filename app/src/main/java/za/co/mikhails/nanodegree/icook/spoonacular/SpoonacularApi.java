@@ -15,15 +15,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import za.co.mikhails.nanodegree.icook.R;
-import za.co.mikhails.nanodegree.icook.provider.ListCursor;
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract;
+import za.co.mikhails.nanodegree.icook.data.ListCursor;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract;
 
 public class SpoonacularApi {
+
     private static final String TAG = SpoonacularApi.class.getSimpleName();
 
     public static final String PARAM_TYPE = "type";
@@ -41,8 +40,10 @@ public class SpoonacularApi {
     public static final String PARAM_INCLUDE_INGREDIENTS = "includeIngredients";
     public static final String PARAM_EXCLUDE_INGREDIENTS = "excludeIngredients";
 
-    static final String RECIPE_VALUES = "recipeValues";
-    static final String INGREDIENT_LIST = "ingredientList";
+    private static final int PARSE_RECIPE_SEARCH_RESULT = 1;
+    private static final int PARSE_RECIPE_DETAILS = 2;
+    private static final int PARSE_RECIPE_SUMMARY = 3;
+    private static final int PARSE_RECIPE_INSTRUCTIONS = 4;
 
     public ListCursor requestAutocompleteSuggestions(Context context, ListCursor listCursor, String query, int limit) {
         HttpURLConnection urlConnection = null;
@@ -72,12 +73,16 @@ public class SpoonacularApi {
                     String[] columnValues = new String[2];
                     while (reader.hasNext()) {
                         String name = reader.nextName();
-                        if (name.equals("id")) {
-                            columnValues[0] = reader.nextString();
-                        } else if (name.equals("title")) {
-                            columnValues[1] = reader.nextString();
-                        } else {
-                            reader.skipValue();
+                        switch (name) {
+                            case "id":
+                                columnValues[0] = reader.nextString();
+                                break;
+                            case "title":
+                                columnValues[1] = reader.nextString();
+                                break;
+                            default:
+                                reader.skipValue();
+                                break;
                         }
                     }
                     listCursor.addRow(columnValues);
@@ -103,307 +108,77 @@ public class SpoonacularApi {
         return listCursor;
     }
 
-    public ContentValues requestRecipeSummary(Context context, long recipeId) {
-        ContentValues result = null;
+    List<ContentValues> requestRecipeDetails(Context context, long recipeId) {
+        Uri builtUri = Uri.parse(context.getString(R.string.recipe_info_url)).buildUpon()
+                .appendPath(String.valueOf(recipeId))
+                .appendPath("information")
+                .appendQueryParameter("includeNutrition", "true")
+                .build();
 
-        if (recipeId != -1) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri builtUri = Uri.parse(context.getString(R.string.recipe_summary_url)).buildUpon()
-                        .appendPath(String.valueOf(recipeId))
-                        .appendPath("summary")
+        return requestSpoonacularData(builtUri,
+                context.getString(R.string.mashape_key), PARSE_RECIPE_DETAILS);
+    }
+
+    List<ContentValues> requestRecipeSummary(Context context, long recipeId) {
+        Uri builtUri = Uri.parse(context.getString(R.string.recipe_info_url)).buildUpon()
+                .appendPath(String.valueOf(recipeId))
+                .appendPath("summary")
 //                        .appendPath("information")
 //                        .appendQueryParameter("includeNutrition", "false")
-                        .build();
+                .build();
 
-                URL url = new URL(builtUri.toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", context.getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                result = parseRecipeSummaryValues(reader);
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
+        return requestSpoonacularData(builtUri,
+                context.getString(R.string.mashape_key), PARSE_RECIPE_SUMMARY);
     }
 
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-//            StringBuilder out = new StringBuilder();
-//            String line;
-//            while ((line = bufferedReader.readLine()) != null) {
-//                out.append(line);
-//            }
-//            Log.d(TAG, "requestQuickSearch: " + out.toString());
-//            bufferedReader.close();
+    List<ContentValues> requestRecipeInstructions(Context context, long recipeId) {
+        Uri builtUri = Uri.parse(context.getString(R.string.recipe_info_url)).buildUpon()
+                .appendPath(String.valueOf(recipeId))
+                .appendPath("analyzedInstructions")
+                .appendQueryParameter("stepBreakdown", "true")
+                .build();
 
-    private ContentValues parseRecipeSummaryValues(JsonReader reader) throws IOException {
-        ContentValues resultValues = new ContentValues();
-        if (reader.hasNext()) {
-
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                if (name.equals("id")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
-                } else if (name.equals("title")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
-                } else if (name.equals("summary")) {
-                    resultValues.put(RecipeContract.RecipeEntry.COLUMN_DESCRIPTION, reader.nextString());
-                } else {
-                    reader.skipValue();
-                }
-            }
-            reader.endObject();
-        }
-        return resultValues;
+        return requestSpoonacularData(builtUri,
+                context.getString(R.string.mashape_key), PARSE_RECIPE_INSTRUCTIONS);
     }
 
-    public Map<String, Object> requestRecipeDetails(Context context, long recipeId) {
-        Map<String, Object> result = null;
+    List<ContentValues> requestQuickSearch(Context context, String query, int offset, int number) {
+        Uri builtUri = Uri.parse(context.getString(R.string.search_url)).buildUpon()
+                .appendQueryParameter("limitLicense", "false")
+                .appendQueryParameter("number", String.valueOf(number))
+                .appendQueryParameter("offset", String.valueOf(offset))
+                .appendQueryParameter("ranking", "1")
+                .appendQueryParameter("minCalories", "0")
+                .appendQueryParameter("maxCalories", "15000")
+                .appendQueryParameter("includeIngredients", "all")
+                .appendQueryParameter("query", query.trim())
+                .build();
 
-        if (recipeId != -1) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri builtUri = Uri.parse(context.getString(R.string.recipe_summary_url)).buildUpon()
-                        .appendPath(String.valueOf(recipeId))
-                        .appendPath("information")
-                        .appendQueryParameter("includeNutrition", "true")
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", context.getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                result = parseRecipeDetailsValues(reader);
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
+        return requestSpoonacularData(builtUri, context.getString(R.string.mashape_key), PARSE_RECIPE_SEARCH_RESULT);
     }
 
-    private Map<String, Object> parseRecipeDetailsValues(JsonReader reader) throws IOException {
-        ContentValues recipeValues = new ContentValues();
-        List<ContentValues> ingredientList = new ArrayList<>();
-        Map<String, Object> result = new HashMap<>();
-        result.put(RECIPE_VALUES, recipeValues);
-        result.put(INGREDIENT_LIST, ingredientList);
+    List<ContentValues> requestAdvancedSearch(Context context, Bundle bundle, int offset, int number) {
+        Uri.Builder builder = Uri.parse(context.getString(R.string.search_url)).buildUpon()
+                .appendQueryParameter("limitLicense", "false")
+                .appendQueryParameter("number", String.valueOf(number))
+                .appendQueryParameter("offset", String.valueOf(offset))
+                .appendQueryParameter("ranking", "1");
+        appendQueryParameter(builder, PARAM_TYPE, bundle);
+        appendQueryParameter(builder, PARAM_CUISINE, bundle);
+        appendQueryParameter(builder, PARAM_DIET, bundle);
+        appendQueryParameter(builder, PARAM_INTOLERANCES, bundle);
+        appendQueryParameter(builder, PARAM_MIN_CALORIES, bundle);
+        appendQueryParameter(builder, PARAM_MAX_CALORIES, bundle);
+        appendQueryParameter(builder, PARAM_MIN_CARBS, bundle);
+        appendQueryParameter(builder, PARAM_MAX_CARBS, bundle);
+        appendQueryParameter(builder, PARAM_MIN_FAT, bundle);
+        appendQueryParameter(builder, PARAM_MAX_FAT, bundle);
+        appendQueryParameter(builder, PARAM_MIN_PROTEIN, bundle);
+        appendQueryParameter(builder, PARAM_MAX_PROTEIN, bundle);
+        appendQueryParameter(builder, PARAM_INCLUDE_INGREDIENTS, bundle);
+        appendQueryParameter(builder, PARAM_EXCLUDE_INGREDIENTS, bundle);
 
-        if (reader.hasNext()) {
-
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                if (name.equals("id")) {
-                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
-                } else if (name.equals("title")) {
-                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
-                } else if (name.equals("readyInMinutes")) {
-                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_READY_IN, reader.nextString());
-                } else if (name.equals("image")) {
-                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_IMAGE_URL, reader.nextString());
-                } else if (name.equals("caloricBreakdown")) {
-
-                    reader.beginObject();
-                    while (reader.hasNext()) {
-                        String percent = reader.nextName();
-                        if (percent.equals("percentProtein")) {
-                            recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_PROTEIN, reader.nextString());
-                        } else if (percent.equals("percentFat")) {
-                            recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_FAT, reader.nextString());
-                        } else if (percent.equals("percentCarbs")) {
-                            recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_CARBS, reader.nextString());
-                        } else {
-                            reader.skipValue();
-                        }
-                    }
-                    reader.endObject();
-
-                } else if (name.equals("extendedIngredients")) {
-                    reader.beginArray();
-                    while (reader.hasNext()) {
-                        ingredientList.add(parseIngredientValues(reader));
-                    }
-                    reader.endArray();
-                } else {
-                    reader.skipValue();
-                }
-            }
-            reader.endObject();
-        }
-        return result;
-    }
-
-
-    @NonNull
-    private ContentValues parseIngredientValues(JsonReader reader) throws IOException {
-        reader.beginObject();
-
-        ContentValues resultValues = new ContentValues();
-        while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("id")) {
-                resultValues.put(RecipeContract.IngredientEntry.COLUMN_ID, reader.nextLong());
-            } else if (name.equals("name")) {
-                resultValues.put(RecipeContract.IngredientEntry.COLUMN_NAME, reader.nextString());
-            } else if (name.equals("image")) {
-                resultValues.put(RecipeContract.IngredientEntry.COLUMN_IMAGE, reader.nextString());
-            } else if (name.equals("amount")) {
-                resultValues.put(RecipeContract.IngredientEntry.COLUMN_AMOUNT, reader.nextString());
-            } else if (name.equals("unit")) {
-                resultValues.put(RecipeContract.IngredientEntry.COLUMN_UNIT, reader.nextString());
-            } else {
-                reader.skipValue();
-            }
-        }
-        reader.endObject();
-        return resultValues;
-    }
-
-    public List<ContentValues> requestQuickSearch(Context context, String query, int limit) {
-        List<ContentValues> result = null;
-
-        if (query != null && query.trim().length() > 0) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri builtUri = Uri.parse(context.getString(R.string.search_url)).buildUpon()
-                        .appendQueryParameter("limitLicense", "false")
-                        .appendQueryParameter("number", String.valueOf(limit))
-                        .appendQueryParameter("offset", "0")
-                        .appendQueryParameter("ranking", "1")
-                        .appendQueryParameter("minCalories", "0")
-                        .appendQueryParameter("maxCalories", "15000")
-                        .appendQueryParameter("includeIngredients", "all")
-                        .appendQueryParameter("query", query.trim())
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", context.getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                result = parseResultValues(reader);
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<ContentValues> requestAdvancedSearch(Context context, Bundle bundle, int limit) {
-        List<ContentValues> result = null;
-
-        if (bundle != null) {
-            HttpURLConnection urlConnection = null;
-            JsonReader reader = null;
-            try {
-                Uri.Builder builder = Uri.parse(context.getString(R.string.search_url)).buildUpon()
-                        .appendQueryParameter("limitLicense", "false")
-                        .appendQueryParameter("number", String.valueOf(limit))
-                        .appendQueryParameter("offset", "0")
-                        .appendQueryParameter("ranking", "1");
-                appendQueryParameter(builder, PARAM_TYPE, bundle);
-                appendQueryParameter(builder, PARAM_CUISINE, bundle);
-                appendQueryParameter(builder, PARAM_DIET, bundle);
-                appendQueryParameter(builder, PARAM_INTOLERANCES, bundle);
-                appendQueryParameter(builder, PARAM_MIN_CALORIES, bundle);
-                appendQueryParameter(builder, PARAM_MAX_CALORIES, bundle);
-                appendQueryParameter(builder, PARAM_MIN_CARBS, bundle);
-                appendQueryParameter(builder, PARAM_MAX_CARBS, bundle);
-                appendQueryParameter(builder, PARAM_MIN_FAT, bundle);
-                appendQueryParameter(builder, PARAM_MAX_FAT, bundle);
-                appendQueryParameter(builder, PARAM_MIN_PROTEIN, bundle);
-                appendQueryParameter(builder, PARAM_MAX_PROTEIN, bundle);
-                appendQueryParameter(builder, PARAM_INCLUDE_INGREDIENTS, bundle);
-                appendQueryParameter(builder, PARAM_EXCLUDE_INGREDIENTS, bundle);
-
-                URL url = new URL(builder.build().toString());
-                Log.d(TAG, "URL: " + url.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("X-Mashape-Key", context.getString(R.string.mashape_key));
-                urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                result = parseResultValues(reader);
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error ", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
-                    }
-                }
-            }
-        }
-        return result;
+        return requestSpoonacularData(builder.build(), context.getString(R.string.mashape_key), PARSE_RECIPE_SEARCH_RESULT);
     }
 
     private void appendQueryParameter(Uri.Builder builder, String paramName, Bundle bundle) {
@@ -412,8 +187,189 @@ public class SpoonacularApi {
         }
     }
 
-    private List<ContentValues> parseResultValues(JsonReader reader) throws IOException {
-        List<ContentValues> resultList = new ArrayList();
+    private List<ContentValues> parseRecipeSummaryValues(JsonReader reader) throws IOException {
+        List<ContentValues> resultList = new ArrayList<>();
+        ContentValues resultValues = new ContentValues();
+        resultList.add(resultValues);
+
+        if (reader.hasNext()) {
+
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String name = reader.nextName();
+                switch (name) {
+                    case "id":
+                        resultValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
+                        break;
+                    case "title":
+                        resultValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
+                        break;
+                    case "summary":
+                        resultValues.put(RecipeContract.RecipeEntry.COLUMN_DESCRIPTION, reader.nextString());
+                        break;
+                    default:
+                        reader.skipValue();
+                        break;
+                }
+            }
+            reader.endObject();
+        }
+        return resultList;
+    }
+
+    private List<ContentValues> parseRecipeDetailsValues(JsonReader reader) throws IOException {
+        List<ContentValues> resultList = new ArrayList<>();
+        ContentValues recipeValues = new ContentValues();
+        resultList.add(recipeValues);
+
+        if (reader.hasNext()) {
+
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String name = reader.nextName();
+                switch (name) {
+                    case "id":
+                        recipeValues.put(RecipeContract.RecipeEntry.COLUMN_ID, reader.nextLong());
+                        break;
+                    case "title":
+                        recipeValues.put(RecipeContract.RecipeEntry.COLUMN_TITLE, reader.nextString());
+                        break;
+                    case "readyInMinutes":
+                        recipeValues.put(RecipeContract.RecipeEntry.COLUMN_READY_IN, reader.nextString());
+                        break;
+                    case "image":
+                        recipeValues.put(RecipeContract.RecipeEntry.COLUMN_IMAGE_URL, reader.nextString());
+                        break;
+                    case "caloricBreakdown":
+
+                        reader.beginObject();
+                        while (reader.hasNext()) {
+                            String percent = reader.nextName();
+                            switch (percent) {
+                                case "percentProtein":
+                                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_PROTEIN, reader.nextString());
+                                    break;
+                                case "percentFat":
+                                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_FAT, reader.nextString());
+                                    break;
+                                case "percentCarbs":
+                                    recipeValues.put(RecipeContract.RecipeEntry.COLUMN_PERCENT_CARBS, reader.nextString());
+                                    break;
+                                default:
+                                    reader.skipValue();
+                                    break;
+                            }
+                        }
+                        reader.endObject();
+
+                        break;
+                    case "extendedIngredients":
+                        reader.beginArray();
+                        while (reader.hasNext()) {
+                            resultList.add(parseIngredientValues(reader));
+                        }
+                        reader.endArray();
+                        break;
+                    default:
+                        reader.skipValue();
+                        break;
+                }
+            }
+            reader.endObject();
+        }
+        return resultList;
+    }
+
+    private List<ContentValues> parseRecipeInstructionsValues(JsonReader reader) throws IOException {
+        List<ContentValues> resultList = new ArrayList<>();
+
+        if (reader.hasNext()) {
+            reader.beginArray();
+
+            while (reader.hasNext()) {
+                reader.beginObject();
+                String itemName = null;
+                List<ContentValues> steps = new ArrayList<>();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    switch (name) {
+                        case "name":
+                            itemName = reader.nextString();
+                            break;
+                        case "steps":
+                            reader.beginArray();
+                            while (reader.hasNext()) {
+                                reader.beginObject();
+                                ContentValues step = new ContentValues();
+                                while (reader.hasNext()) {
+                                    String attribute = reader.nextName();
+                                    switch (attribute) {
+                                        case "number":
+                                            step.put(RecipeContract.InstructionsEntry.COLUMN_NUMBER, reader.nextString());
+                                            break;
+                                        case "step":
+                                            step.put(RecipeContract.InstructionsEntry.COLUMN_STEP, reader.nextString());
+                                            break;
+                                        default:
+                                            reader.skipValue();
+                                            break;
+                                    }
+                                }
+                                reader.endObject();
+                                steps.add(step);
+                            }
+                            reader.endArray();
+                            break;
+                        default:
+                            reader.skipValue();
+                            break;
+                    }
+                }
+                reader.endObject();
+                for (ContentValues step : steps) {
+                    step.put(RecipeContract.InstructionsEntry.COLUMN_NAME, itemName);
+                    resultList.add(step);
+                }
+            }
+            reader.endArray();
+        }
+        return resultList;
+    }
+
+    @NonNull
+    private ContentValues parseIngredientValues(JsonReader reader) throws IOException {
+        reader.beginObject();
+
+        ContentValues resultValues = new ContentValues();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            switch (name) {
+                case "id":
+                    resultValues.put(RecipeContract.IngredientEntry.COLUMN_ID, reader.nextLong());
+                    break;
+                case "name":
+                    resultValues.put(RecipeContract.IngredientEntry.COLUMN_NAME, reader.nextString());
+                    break;
+                case "image":
+                    resultValues.put(RecipeContract.IngredientEntry.COLUMN_IMAGE, reader.nextString());
+                    break;
+                case "amount":
+                    resultValues.put(RecipeContract.IngredientEntry.COLUMN_AMOUNT, reader.nextString());
+                    break;
+                case "unit":
+                    resultValues.put(RecipeContract.IngredientEntry.COLUMN_UNIT, reader.nextString());
+                    break;
+                default:
+                    reader.skipValue();
+                    break;
+            }
+        }
+        reader.endObject();
+        return resultValues;
+    }
+
+    private List<ContentValues> parseSearchResultValues(JsonReader reader) throws IOException {
+        List<ContentValues> resultList = new ArrayList<>();
         String baseUrl = null;
         while (reader.hasNext()) {
 
@@ -423,7 +379,7 @@ public class SpoonacularApi {
                 if (name.equals("results") && reader.peek() != JsonToken.NULL) {
                     reader.beginArray();
                     while (reader.hasNext()) {
-                        resultList.add(parseContentValues(reader));
+                        resultList.add(parseSearchContentValues(reader));
                     }
                     reader.endArray();
                 } else if (name.equals("baseUri")) {
@@ -442,34 +398,96 @@ public class SpoonacularApi {
     }
 
     @NonNull
-    private ContentValues parseContentValues(JsonReader reader) throws IOException {
+    private ContentValues parseSearchContentValues(JsonReader reader) throws IOException {
         reader.beginObject();
 
         ContentValues resultValues = new ContentValues();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("id")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_ID, reader.nextLong());
-            } else if (name.equals("title")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_TITLE, reader.nextString());
-            } else if (name.equals("image")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE, reader.nextString());
-            } else if (name.equals("imageType")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE_TYPE, reader.nextString());
-            } else if (name.equals("calories")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CALORIES, reader.nextString());
-            } else if (name.equals("protein")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_PROTEIN, reader.nextString());
-            } else if (name.equals("fat")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_FAT, reader.nextString());
-            } else if (name.equals("carbs")) {
-                resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CARBS, reader.nextString());
-            } else {
-                reader.skipValue();
+            switch (name) {
+                case "id":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_ID, reader.nextLong());
+                    break;
+                case "title":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_TITLE, reader.nextString());
+                    break;
+                case "image":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE, reader.nextString());
+                    break;
+                case "imageType":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_IMAGE_TYPE, reader.nextString());
+                    break;
+                case "calories":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CALORIES, reader.nextString());
+                    break;
+                case "protein":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_PROTEIN, reader.nextString());
+                    break;
+                case "fat":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_FAT, reader.nextString());
+                    break;
+                case "carbs":
+                    resultValues.put(RecipeContract.SearchResultEntry.COLUMN_CARBS, reader.nextString());
+                    break;
+                default:
+                    reader.skipValue();
+                    break;
             }
         }
         reader.endObject();
         return resultValues;
+    }
+
+
+    private List<ContentValues> requestSpoonacularData(Uri builtUri, String mashapeKey, int dataType) {
+        List<ContentValues> result = null;
+
+        HttpURLConnection urlConnection = null;
+        JsonReader reader = null;
+        try {
+
+            URL url = new URL(builtUri.toString());
+            Log.d(TAG, "URL: " + url.toString());
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("X-Mashape-Key", mashapeKey);
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+
+            reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+            result = parseSpoonacularJson(dataType, reader);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error ", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(TAG, "Error closing stream", e);
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<ContentValues> parseSpoonacularJson(int dataType, JsonReader reader) throws IOException {
+        switch (dataType) {
+            case PARSE_RECIPE_SEARCH_RESULT:
+                return parseSearchResultValues(reader);
+            case PARSE_RECIPE_DETAILS:
+                return parseRecipeDetailsValues(reader);
+            case PARSE_RECIPE_SUMMARY:
+                return parseRecipeSummaryValues(reader);
+            case PARSE_RECIPE_INSTRUCTIONS:
+                return parseRecipeInstructionsValues(reader);
+        }
+        throw new UnsupportedOperationException("Unknown data type: " + dataType);
     }
 
 }

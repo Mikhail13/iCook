@@ -2,6 +2,7 @@ package za.co.mikhails.nanodegree.icook;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,16 +10,19 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 
-public class AdvancedSearchResultActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AdvancedSearchResultActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
     private static final String TAG = AdvancedSearchResultActivity.class.getSimpleName();
     public static final String VALUES_BUNDLE = "values_bundle";
@@ -39,6 +43,8 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
         searchResult = (ListView) findViewById(R.id.search_result);
         searchResultAdapter = new SearchResultAdapter(this, null, 0);
         searchResult.setAdapter(searchResultAdapter);
+        searchResult.setOnItemSelectedListener(this);
+        searchResult.setOnItemClickListener(this);
 
         AdView mAdView = (AdView) findViewById(R.id.ad_banner);
         if (mAdView != null) {
@@ -98,5 +104,25 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
         if (loader == searchResultLoader) {
             searchResultAdapter.swapCursor(null);
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        onItemClick(parent, view, position, id);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        long recipeId = (Long) view.getTag(R.id.RECIPE_ID);
+        Log.d(TAG, "onItemClick: " + recipeId);
+
+        Intent intent = new Intent(this, RecipeDetailsActivity.class);
+        intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
+        intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
+        startActivity(intent);
     }
 }

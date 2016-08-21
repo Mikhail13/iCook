@@ -7,23 +7,26 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import za.co.mikhails.nanodegree.icook.data.IngredientsListLoader;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TabIngredientsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+import za.co.mikhails.nanodegree.icook.data.InstructionsListLoader;
+import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
+
+public class TabInstructionsFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String RECIPE_ID = RecipeDetailsActivity.RECIPE_ID;
     private long recipeId = -1;
-    private CursorAdapter cursorAdapter;
+    private InstructionsListAdapter cursorAdapter;
 
     public static Fragment newInstance(long recipeId) {
         Bundle arguments = new Bundle();
         arguments.putLong(RECIPE_ID, recipeId);
-        TabIngredientsFragment fragment = new TabIngredientsFragment();
+        TabInstructionsFragment fragment = new TabInstructionsFragment();
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -31,7 +34,7 @@ public class TabIngredientsFragment extends ListFragment implements LoaderManage
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.tab_ingredients_fragment, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.tab_instructions_fragment, container, false);
 
         if (getArguments().containsKey(RECIPE_ID)) {
             recipeId = getArguments().getLong(RECIPE_ID);
@@ -39,7 +42,7 @@ public class TabIngredientsFragment extends ListFragment implements LoaderManage
             recipeId = savedInstanceState.getLong(RECIPE_ID);
         }
 
-        cursorAdapter = new IngredientsListAdapter(getContext(), null, 0);
+        cursorAdapter = new InstructionsListAdapter(getContext(), null, 0);
         setListAdapter(cursorAdapter);
 
         return rootView;
@@ -48,6 +51,7 @@ public class TabIngredientsFragment extends ListFragment implements LoaderManage
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        SyncAdapter.syncRecipeInstructionsImmediately(getContext(), recipeId);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -61,11 +65,26 @@ public class TabIngredientsFragment extends ListFragment implements LoaderManage
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return IngredientsListLoader.newInstanceForRecipeId(getContext(), recipeId);
+        return InstructionsListLoader.newInstanceForRecipeId(getContext(), recipeId);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor data) {
+        Map<Integer, String> namePositions = new HashMap<>();
+        String previous = "";
+        data.moveToPosition(-1);
+
+        while (data.moveToNext()) {
+            String nameValue = data.getString(InstructionsListLoader.Query.NAME);
+
+            if (!previous.equals(nameValue)) {
+                namePositions.put(data.getPosition(), nameValue);
+                previous = nameValue;
+            }
+        }
+        data.moveToPosition(-1);
+        cursorAdapter.setNamePositions(namePositions);
+
         cursorAdapter.swapCursor(data);
     }
 

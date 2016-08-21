@@ -1,9 +1,7 @@
 package za.co.mikhails.nanodegree.icook;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ShareCompat;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,16 +22,6 @@ public class TabSummaryFragment extends Fragment {
         if (savedInstanceState != null && savedInstanceState.containsKey(DESCRIPTION_TEXT)) {
             setText(savedInstanceState.getString(DESCRIPTION_TEXT));
         }
-
-        rootView.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
-                        .getIntent(), getString(R.string.action_favorites)));
-            }
-        });
 
         return rootView;
     }

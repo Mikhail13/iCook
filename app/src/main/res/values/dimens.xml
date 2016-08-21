@@ -15,4 +15,9 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="app_bar_elevation">6dp</dimen>
 
+    <dimen name="ingredient_list_image_width">32dp</dimen>
+    <dimen name="ingredient_list_image_height">32dp</dimen>
+    <dimen name="ingredient_list_text_horizontal_margin">16dp</dimen>
+    <dimen name="ingredient_list_item_padding">8dp</dimen>
+
 </resources>

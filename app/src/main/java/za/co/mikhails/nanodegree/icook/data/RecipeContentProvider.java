@@ -1,4 +1,4 @@
-package za.co.mikhails.nanodegree.icook.provider;
+package za.co.mikhails.nanodegree.icook.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,19 +7,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract.IngredientEntry;
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract.RecipeEntry;
-import za.co.mikhails.nanodegree.icook.provider.RecipeContract.SearchResultEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.FavoritesEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.IngredientEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.InstructionsEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.RecipeEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.SearchResultEntry;
+import za.co.mikhails.nanodegree.icook.data.RecipeContract.ShoppingListEntry;
 
 public class RecipeContentProvider extends ContentProvider {
-
-    private static final String TAG = RecipeContentProvider.class.getSimpleName();
 
     private static final int SEARCH_RESULT = 100;
     private static final int RECIPE = 200;
     private static final int RECIPE_DETAILS = 300;
     private static final int INGREDIENT = 400;
     private static final int INGREDIENT_LIST = 500;
+    private static final int INSTRUCTIONS = 600;
+    private static final int FAVORITES = 700;
+    private static final int SHOPPING_LIST = 800;
 
     protected UriMatcher uriMatcher;
     private RecipeDbHelper dbHelper;
@@ -44,6 +48,8 @@ public class RecipeContentProvider extends ContentProvider {
                 return RecipeEntry.CONTENT_TYPE;
             case INGREDIENT:
                 return IngredientEntry.CONTENT_TYPE;
+            case SHOPPING_LIST:
+                return ShoppingListEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -58,6 +64,10 @@ public class RecipeContentProvider extends ContentProvider {
                 retCursor = dbHelper.getReadableDatabase().query(SearchResultEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
+            case FAVORITES:
+                retCursor = dbHelper.getReadableDatabase().query(FavoritesEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
             case RECIPE_DETAILS:
                 retCursor = dbHelper.getReadableDatabase().query(RecipeEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
@@ -65,6 +75,14 @@ public class RecipeContentProvider extends ContentProvider {
             case INGREDIENT:
             case INGREDIENT_LIST:
                 retCursor = dbHelper.getReadableDatabase().query(IngredientEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case INSTRUCTIONS:
+                retCursor = dbHelper.getReadableDatabase().query(InstructionsEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case SHOPPING_LIST:
+                retCursor = dbHelper.getReadableDatabase().query(ShoppingListEntry.TABLE_NAME,
                         projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
@@ -91,6 +109,14 @@ public class RecipeContentProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
                 break;
+            case FAVORITES:
+                itemId = db.insert(FavoritesEntry.TABLE_NAME, null, values);
+                if (itemId > 0) {
+                    returnUri = FavoritesEntry.buildResultUri(itemId);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
             case RECIPE_DETAILS:
                 itemId = db.insertWithOnConflict(RecipeEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (itemId > 0) {
@@ -103,6 +129,14 @@ public class RecipeContentProvider extends ContentProvider {
                 itemId = db.insertWithOnConflict(IngredientEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                 if (itemId > 0) {
                     returnUri = IngredientEntry.buildResultUri(itemId);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            case SHOPPING_LIST:
+                itemId = db.insertWithOnConflict(ShoppingListEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                if (itemId > 0) {
+                    returnUri = ShoppingListEntry.buildResultUri(itemId);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -152,6 +186,22 @@ public class RecipeContentProvider extends ContentProvider {
                 }
                 result = returnIngredientCount;
                 break;
+            case INSTRUCTIONS:
+                db.beginTransaction();
+                int returnInstructionsCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insertWithOnConflict(InstructionsEntry.TABLE_NAME, null, value, SQLiteDatabase.CONFLICT_REPLACE);
+                        if (_id != -1) {
+                            returnInstructionsCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                result = returnInstructionsCount;
+                break;
             default:
                 result = super.bulkInsert(uri, values);
         }
@@ -168,6 +218,9 @@ public class RecipeContentProvider extends ContentProvider {
         switch (match) {
             case RECIPE_DETAILS:
                 updated = db.update(RecipeEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case SHOPPING_LIST:
+                updated = db.update(ShoppingListEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -188,6 +241,15 @@ public class RecipeContentProvider extends ContentProvider {
             case SEARCH_RESULT:
                 rowsDeleted = db.delete(SearchResultEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case INSTRUCTIONS:
+                rowsDeleted = db.delete(InstructionsEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case FAVORITES:
+                rowsDeleted = db.delete(FavoritesEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case SHOPPING_LIST:
+                rowsDeleted = db.delete(ShoppingListEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -206,6 +268,9 @@ public class RecipeContentProvider extends ContentProvider {
         matcher.addURI(authority, RecipeContract.PATH_RECIPE, RECIPE_DETAILS);
         matcher.addURI(authority, RecipeContract.PATH_INGREDIENT, INGREDIENT);
         matcher.addURI(authority, RecipeContract.PATH_INGREDIENT_LIST, INGREDIENT_LIST);
+        matcher.addURI(authority, RecipeContract.PATH_INSTRUCTIONS, INSTRUCTIONS);
+        matcher.addURI(authority, RecipeContract.PATH_FAVORITES, FAVORITES);
+        matcher.addURI(authority, RecipeContract.PATH_SHOPPING_LIST, SHOPPING_LIST);
 
         return matcher;
     }

@@ -1,4 +1,4 @@
-package za.co.mikhails.nanodegree.icook.provider;
+package za.co.mikhails.nanodegree.icook.data;
 
 import android.database.AbstractCursor;
 
