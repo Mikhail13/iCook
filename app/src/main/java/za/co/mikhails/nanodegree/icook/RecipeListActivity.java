@@ -31,11 +31,11 @@ import com.google.android.gms.ads.AdView;
 import za.co.mikhails.nanodegree.icook.data.SearchResultLoader;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class RecipeListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = RecipeListActivity.class.getSimpleName();
     private static final int SEARCH_RESULT_LOADER = 1;
     private static final String SEARCH_QUERY = "search_query";
     private View progressIndicator;
@@ -45,10 +45,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Parcelable restoreListViewState;
     private SearchView searchView;
 
+    private boolean mTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_quick_search);
+        setContentView(R.layout.activity_recipe_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
+
+        if (findViewById(R.id.recipe_detail_container) != null) {
+            mTwoPane = true;
+        }
     }
 
     @Override
@@ -212,10 +218,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         long recipeId = (Long) view.getTag(R.id.RECIPE_ID);
         Log.d(TAG, "onItemClick: " + recipeId);
 
-        Intent intent = new Intent(this, RecipeDetailsActivity.class);
-        intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
-        intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
-        startActivity(intent);
+        if (mTwoPane) {
+            RecipeDetailsFragment fragment = RecipeDetailsFragment.newInstance(recipeId, this.getClass().getSimpleName(), false);
+            getSupportFragmentManager().beginTransaction().replace(R.id.recipe_detail_container, fragment).commit();
+        } else {
+            Intent intent = new Intent(this, RecipeDetailsActivity.class);
+            intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
+            intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
+            startActivity(intent);
+        }
+
     }
 
     @Override
@@ -229,4 +241,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             SyncAdapter.loadNextPageOnScroll(this);
         }
     }
+
 }

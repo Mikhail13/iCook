@@ -14,8 +14,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.MainActivity"
+            android:name=".RecipeListActivity"
             android:label="@string/app_label"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -32,19 +33,19 @@
         </activity>
 
         <provider
-            android:name="za.co.mikhails.nanodegree.icook.data.AutocompleteSuggestionProvider"
+            android:name=".data.AutocompleteSuggestionProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.autocomplete"
             android:enabled="true"
             android:exported="false"
             android:syncable="true" />
         <provider
-            android:name="za.co.mikhails.nanodegree.icook.data.RecipeContentProvider"
+            android:name=".data.RecipeContentProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.recipe"
             android:enabled="true"
             android:exported="false"
             android:syncable="true" />
 
-        <service android:name="za.co.mikhails.nanodegree.icook.spoonacular.ICookDbAuthenticatorService">
+        <service android:name=".spoonacular.ICookDbAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -54,7 +55,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name="za.co.mikhails.nanodegree.icook.spoonacular.ICookDbSyncService"
+            android:name=".spoonacular.ICookDbSyncService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -66,46 +67,46 @@
         </service>
 
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity"
+            android:name=".AdvancedSearchActivity"
             android:label="@string/advanced_search_label"
             android:launchMode="singleTask"
-            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
+            android:parentActivityName=".RecipeListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".RecipeListActivity" />
         </activity>
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.AdvancedSearchResultActivity"
+            android:name=".AdvancedSearchResultActivity"
             android:label="@string/advanced_search_label"
-            android:parentActivityName="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity">
+            android:parentActivityName=".AdvancedSearchActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity" />
         </activity>
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.RecipeDetailsActivity"
+            android:name=".RecipeDetailsActivity"
             android:label="@string/title_activity_recipe_details"
-            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity"
+            android:parentActivityName=".RecipeListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+                android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.FavoritesActivity"
+            android:name=".FavoritesActivity"
             android:label="@string/title_activity_favorites_details"
-            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
+            android:parentActivityName=".RecipeListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+                android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
         <activity
-            android:name="za.co.mikhails.nanodegree.icook.ShoppingListActivity"
+            android:name=".ShoppingListActivity"
             android:label="@string/title_activity_shopping_list"
-            android:parentActivityName="za.co.mikhails.nanodegree.icook.MainActivity">
+            android:parentActivityName=".RecipeListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="za.co.mikhails.nanodegree.icook.MainActivity" />
+                android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
     </application>
 

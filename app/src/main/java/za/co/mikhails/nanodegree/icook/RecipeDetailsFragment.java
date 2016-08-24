@@ -1,7 +1,6 @@
 package za.co.mikhails.nanodegree.icook;
 
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
@@ -12,14 +11,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +57,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     private int selectedTab = 0;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
 
-    public static Fragment newInstance(long recipeId, String navigateBack, boolean isFavorite) {
+    public static RecipeDetailsFragment newInstance(long recipeId, String navigateBack, boolean isFavorite) {
         Bundle arguments = new Bundle();
         arguments.putLong(RecipeDetailsActivity.RECIPE_ID, recipeId);
         arguments.putString(RecipeDetailsActivity.NAVIGATE_BACK, navigateBack);
@@ -93,20 +88,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             navigateBack = savedInstanceState.getString(SAVED_NAVIGATE_BACK);
         }
 
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         final AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(toolbar);
-        ActionBar supportActionBar = activity.getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Class parenClass = navigateBack.equals(MainActivity.class.getSimpleName()) ? MainActivity.class : AdvancedSearchResultActivity.class;
-                NavUtils.navigateUpTo(activity, new Intent(getContext(), parenClass));
-            }
-        });
 
         final ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
         tabSummaryFragment = new TabSummaryFragment();
@@ -139,37 +121,39 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             }
         };
         viewPager.setAdapter(pagerAdapter);
-        tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
-        onTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        tabLayout = (TabLayout) activity.findViewById(R.id.tab_layout);
+        if (tabLayout != null) {
+            tabLayout.setupWithViewPager(viewPager);
+            onTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                super.onTabSelected(tab);
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    super.onTabSelected(tab);
 
-                selectedTab = tab.getPosition();
-                switch (selectedTab) {
-                    case 0:
-                        if (isFavorite) {
-                            fab.setVisibility(View.GONE);
-                        } else {
+                    selectedTab = tab.getPosition();
+                    switch (selectedTab) {
+                        case 0:
+                            if (isFavorite) {
+                                fab.setVisibility(View.GONE);
+                            } else {
+                                fab.setVisibility(View.VISIBLE);
+                                fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_star_white));
+                                fab.setTag(ADD_TO_FAVORITES);
+                            }
+                            break;
+                        case 1:
                             fab.setVisibility(View.VISIBLE);
-                            fab.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_star_white));
-                            fab.setTag(ADD_TO_FAVORITES);
-                        }
-                        break;
-                    case 1:
-                        fab.setVisibility(View.VISIBLE);
-                        fab.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_shopping_cart_white));
-                        fab.setTag(ADD_TO_SHOPPING_LIST);
-                        break;
-                    case 2:
-                        fab.setVisibility(View.GONE);
-                        break;
+                            fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_shopping_cart_white));
+                            fab.setTag(ADD_TO_SHOPPING_LIST);
+                            break;
+                        case 2:
+                            fab.setVisibility(View.GONE);
+                            break;
+                    }
                 }
-            }
-        };
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+            };
+            tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        }
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -198,12 +182,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             }
         });
 
-        NestedScrollView nestedScrollView = (NestedScrollView) rootView.findViewById(R.id.nested_scroll_view);
-        nestedScrollView.setFillViewport(true);
+        toolbarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 
-        toolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.toolbar_layout);
-
-        imageView = (ImageView) rootView.findViewById(R.id.toolbar_image);
+        imageView = (ImageView) activity.findViewById(R.id.toolbar_image);
 
         return rootView;
     }
@@ -226,7 +207,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         if (savedInstanceState != null) {
             selectedTab = savedInstanceState.getInt(SAVED_SELECTED_TAB, 0);
         }
-        onTabSelectedListener.onTabSelected(tabLayout.getTabAt(selectedTab));
+        if (onTabSelectedListener != null && tabLayout != null) {
+            onTabSelectedListener.onTabSelected(tabLayout.getTabAt(selectedTab));
+        }
     }
 
     @Override
@@ -246,7 +229,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if (isAdded() && cursor != null && cursor.moveToFirst()) {
 
-            toolbarLayout.setTitle(cursor.getString(RecipeDetailsLoader.Query.TITLE));
+            if (toolbarLayout != null) {
+                toolbarLayout.setTitle(cursor.getString(RecipeDetailsLoader.Query.TITLE));
+            }
 
             tabSummaryFragment.setText(cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION));
 
@@ -254,9 +239,11 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
                 tabIngredientsFragment.getLoaderManager().getLoader(0).forceLoad();
             }
 
-            String toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
-            if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
-                Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
+            if (imageView != null) {
+                String toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
+                if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
+                    Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
+                }
             }
         }
     }

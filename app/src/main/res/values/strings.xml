@@ -8,7 +8,6 @@
     <string name="content_authority">za.co.mikhails.nanodegree.icook.provider.recipe</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
-    <!--<string name="autocomplete_ingredients_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete?metaInformation=false</string>-->
     <string name="autocomplete_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete</string>
     <string name="search_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex</string>
     <string name="ingredients_url">https://spoonacular.com/cdn/ingredients_100x100/</string>
