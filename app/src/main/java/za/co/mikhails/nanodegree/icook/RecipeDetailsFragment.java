@@ -43,6 +43,12 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
     private static final String ADD_TO_FAVORITES = "add_to_favorites";
     private static final String ADD_TO_SHOPPING_LIST = "add_to_shopping_list";
+
+    private static final String SAVED_RECIPE_ID = "saved_recipe_id";
+    private static final String SAVED_IS_FAVORITE = "saved_is_favorite";
+    private static final String SAVED_NAVIGATE_BACK = "saved_navigate_back";
+    private static final String SAVED_SELECTED_TAB = "saved_selected_tab";
+
     private long recipeId;
     private boolean isFavorite;
     private String navigateBack;
@@ -81,6 +87,12 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recipe_details, container, false);
 
+        if (savedInstanceState != null) {
+            recipeId = savedInstanceState.getLong(SAVED_RECIPE_ID);
+            isFavorite = savedInstanceState.getBoolean(SAVED_IS_FAVORITE);
+            navigateBack = savedInstanceState.getString(SAVED_NAVIGATE_BACK);
+        }
+
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         final AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -95,6 +107,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
                 NavUtils.navigateUpTo(activity, new Intent(getContext(), parenClass));
             }
         });
+
         final ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.view_pager);
         tabSummaryFragment = new TabSummaryFragment();
         tabIngredientsFragment = TabIngredientsFragment.newInstance(recipeId);
@@ -134,7 +147,8 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
 
-                switch (tab.getPosition()) {
+                selectedTab = tab.getPosition();
+                switch (selectedTab) {
                     case 0:
                         if (isFavorite) {
                             fab.setVisibility(View.GONE);
@@ -195,14 +209,30 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putLong(SAVED_RECIPE_ID, recipeId);
+        savedInstanceState.putBoolean(SAVED_IS_FAVORITE, isFavorite);
+        savedInstanceState.putString(SAVED_NAVIGATE_BACK, navigateBack);
+        savedInstanceState.putInt(SAVED_SELECTED_TAB, selectedTab);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            selectedTab = savedInstanceState.getInt(SAVED_SELECTED_TAB, 0);
+        }
         onTabSelectedListener.onTabSelected(tabLayout.getTabAt(selectedTab));
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         SyncAdapter.syncRecipeDetailsImmediately(getContext(), recipeId);
         getLoaderManager().initLoader(0, null, this);
     }

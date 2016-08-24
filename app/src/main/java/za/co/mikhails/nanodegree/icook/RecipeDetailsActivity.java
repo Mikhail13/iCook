@@ -17,13 +17,15 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        long recipeId = getIntent().getLongExtra(RECIPE_ID, -1);
-        String navigateBack = getIntent().getStringExtra(NAVIGATE_BACK);
-        boolean isFavorite = getIntent().getBooleanExtra(IS_FAVORITE, false);
-        fragmentTransaction.add(R.id.fragment_container, RecipeDetailsFragment.newInstance(recipeId, navigateBack, isFavorite));
-        fragmentTransaction.commit();
+        if (savedInstanceState == null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            long recipeId = getIntent().getLongExtra(RECIPE_ID, -1);
+            String navigateBack = getIntent().getStringExtra(NAVIGATE_BACK);
+            boolean isFavorite = getIntent().getBooleanExtra(IS_FAVORITE, false);
+            fragmentTransaction.add(R.id.fragment_container, RecipeDetailsFragment.newInstance(recipeId, navigateBack, isFavorite));
+            fragmentTransaction.commit();
+        }
 
         View view = findViewById(android.R.id.content);
         view.setAlpha(0);
