@@ -7,6 +7,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -36,9 +38,9 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.search_result);
+        setContentView(R.layout.shopping_list);
 
-        shoppingListView = (ListView) findViewById(R.id.search_result);
+        shoppingListView = (ListView) findViewById(R.id.list_view);
         shoppingListAdapter = new ShoppingListAdapter(this, null, 0);
         shoppingListView.setAdapter(shoppingListAdapter);
         shoppingListView.setOnItemSelectedListener(this);
@@ -58,6 +60,15 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
                     .build();
             mAdView.loadAd(adRequest);
         }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment dialogFragment = new IngredientInputDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "ingredient");
+            }
+        });
 
         getLoaderManager().restartLoader(0, null, this);
     }

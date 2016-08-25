@@ -44,8 +44,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
     private CursorLoader searchResultLoader;
     private Parcelable restoreListViewState;
     private SearchView searchView;
-
-    private boolean mTwoPane;
+    private boolean twoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +63,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        searchResult = (ListView) findViewById(R.id.search_result);
+        searchResult = (ListView) findViewById(R.id.list_view);
         searchResultAdapter = new SearchResultAdapter(this, null, 0);
         searchResult.setAdapter(searchResultAdapter);
         searchResult.setOnItemSelectedListener(this);
@@ -83,7 +82,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
 
         if (findViewById(R.id.recipe_detail_container) != null) {
-            mTwoPane = true;
+            twoPane = true;
         }
     }
 
@@ -218,7 +217,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
         long recipeId = (Long) view.getTag(R.id.RECIPE_ID);
         Log.d(TAG, "onItemClick: " + recipeId);
 
-        if (mTwoPane) {
+        if (twoPane) {
             RecipeDetailsFragment fragment = RecipeDetailsFragment.newInstance(recipeId, this.getClass().getSimpleName(), false);
             getSupportFragmentManager().beginTransaction().replace(R.id.recipe_detail_container, fragment).commit();
         } else {

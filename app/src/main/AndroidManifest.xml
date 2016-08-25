@@ -39,6 +39,12 @@
             android:exported="false"
             android:syncable="true" />
         <provider
+            android:name=".data.AutocompleteIngredientsProvider"
+            android:authorities="za.co.mikhails.nanodegree.icook.provider.ingredients"
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="true" />
+        <provider
             android:name=".data.RecipeContentProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.recipe"
             android:enabled="true"

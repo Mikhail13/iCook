@@ -38,7 +38,7 @@ public class FavoritesActivity extends AppCompatActivity implements LoaderManage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result);
 
-        favoritesListView = (ListView) findViewById(R.id.search_result);
+        favoritesListView = (ListView) findViewById(R.id.list_view);
         favoritesAdapter = new SearchResultAdapter(this, null, 0);
         favoritesListView.setAdapter(favoritesAdapter);
         favoritesListView.setOnItemSelectedListener(this);

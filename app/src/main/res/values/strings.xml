@@ -9,6 +9,7 @@
 
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="autocomplete_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete</string>
+    <string name="autocomplete_ingredients_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete</string>
     <string name="search_url">https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex</string>
     <string name="ingredients_url">https://spoonacular.com/cdn/ingredients_100x100/</string>
     <string name="search_result_default_image_url">http://spoonacular.com/recipeImages/275104-</string>
@@ -42,5 +43,8 @@
     <string name="search_result_favorites_empty_text">No favorites</string>
     <string name="search_result_shopping_list_empty_text">List is empty</string>
     <string name="tab_no_data_text">No data</string>
+    <string name="add_ingredient">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_ingredient_input_title">Add to list</string>
 
 </resources>

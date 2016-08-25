@@ -34,13 +34,14 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
     private CursorLoader searchResultLoader;
     private Parcelable restoreListViewState;
     private SearchView searchView;
+    private boolean twoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result);
 
-        searchResult = (ListView) findViewById(R.id.search_result);
+        searchResult = (ListView) findViewById(R.id.list_view);
         searchResultAdapter = new SearchResultAdapter(this, null, 0);
         searchResult.setAdapter(searchResultAdapter);
         searchResult.setOnItemSelectedListener(this);
@@ -67,6 +68,10 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
 //        Bundle bundle = new Bundle();
 //        bundle.putString(SEARCH_QUERY, query);
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
+
+        if (findViewById(R.id.recipe_detail_container) != null) {
+            twoPane = true;
+        }
 
         //TODO: show progress bar
     }
@@ -120,9 +125,14 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
         long recipeId = (Long) view.getTag(R.id.RECIPE_ID);
         Log.d(TAG, "onItemClick: " + recipeId);
 
-        Intent intent = new Intent(this, RecipeDetailsActivity.class);
-        intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
-        intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
-        startActivity(intent);
+        if (twoPane) {
+            RecipeDetailsFragment fragment = RecipeDetailsFragment.newInstance(recipeId, this.getClass().getSimpleName(), false);
+            getSupportFragmentManager().beginTransaction().replace(R.id.recipe_detail_container, fragment).commit();
+        } else {
+            Intent intent = new Intent(this, RecipeDetailsActivity.class);
+            intent.putExtra(RecipeDetailsActivity.RECIPE_ID, recipeId);
+            intent.putExtra(RecipeDetailsActivity.NAVIGATE_BACK, this.getClass().getSimpleName());
+            startActivity(intent);
+        }
     }
 }

@@ -15,7 +15,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import za.co.mikhails.nanodegree.icook.R;
 import za.co.mikhails.nanodegree.icook.data.ListCursor;
@@ -67,6 +69,7 @@ public class SpoonacularApi {
 
             if (reader.hasNext()) {
                 reader.beginArray();
+                Set<String> uniqueTitle = new HashSet<>();
                 while (reader.hasNext()) {
                     reader.beginObject();
 
@@ -85,7 +88,76 @@ public class SpoonacularApi {
                                 break;
                         }
                     }
-                    listCursor.addRow(columnValues);
+                    if (uniqueTitle.add(columnValues[1])) {
+                        listCursor.addRow(columnValues);
+                    }
+                    reader.endObject();
+                }
+                reader.endArray();
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error ", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(TAG, "Error closing stream", e);
+                }
+            }
+        }
+        return listCursor;
+    }
+
+    public ListCursor requestAutocompleteIngredients(Context context, ListCursor listCursor, String query, int limit) {
+        HttpURLConnection urlConnection = null;
+        JsonReader reader = null;
+        try {
+            Uri builtUri = Uri.parse(context.getString(R.string.autocomplete_ingredients_url)).buildUpon()
+                    .appendQueryParameter("metaInformation", "true")
+                    .appendQueryParameter("number", String.valueOf(limit))
+                    .appendQueryParameter("query", query.trim())
+                    .build();
+
+            URL url = new URL(builtUri.toString());
+            Log.d(TAG, "URL: " + url.toString());
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("X-Mashape-Key", context.getString(R.string.mashape_key));
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+            reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+
+            if (reader.hasNext()) {
+                reader.beginArray();
+                Set<String> uniqueTitle = new HashSet<>();
+                while (reader.hasNext()) {
+                    reader.beginObject();
+
+                    String[] columnValues = new String[2];
+                    while (reader.hasNext()) {
+                        String name = reader.nextName();
+                        switch (name) {
+                            case "id":
+                                columnValues[0] = reader.nextString();
+                                break;
+                            case "name":
+                                columnValues[1] = reader.nextString();
+                                break;
+                            default:
+                                reader.skipValue();
+                                break;
+                        }
+                    }
+                    if (uniqueTitle.add(columnValues[1])) {
+                        listCursor.addRow(columnValues);
+                    }
                     reader.endObject();
                 }
                 reader.endArray();
