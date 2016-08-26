@@ -4,6 +4,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
     </style>
 
     <style name="SearchResultPrimaryText" parent="AppTheme">
@@ -28,13 +30,13 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="NavigationTab" parent="Widget.Design.TabLayout">
-        <item name="tabBackground">@android:color/transparent</item>
-        <item name="tabSelectedTextColor">@android:color/white</item>
+        <item name="tabBackground">@color/colorBackground</item>
+        <item name="tabSelectedTextColor">@color/colorAccent</item>
         <item name="tabTextAppearance">@style/NavigationTabTextAppeareance</item>
     </style>
 
     <style name="NavigationTabTextAppeareance" parent="TextAppearance.Design.Tab">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
 </resources>

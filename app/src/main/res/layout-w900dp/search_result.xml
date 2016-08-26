@@ -58,30 +58,23 @@
             android:layout_weight="3"
             android:orientation="vertical"
             android:paddingLeft="@dimen/recipe_detail_container_padding"
-            android:paddingTop="@dimen/recipe_detail_container_padding"
-            android:paddingRight="@dimen/recipe_detail_container_padding">
+            android:paddingRight="@dimen/recipe_detail_container_padding"
+            android:paddingTop="@dimen/recipe_detail_container_padding">
 
-            <FrameLayout
+            <ImageView
+                android:id="@+id/toolbar_image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/app_bar_height"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
 
-                <ImageView
-                    android:id="@+id/toolbar_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/app_bar_height"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop" />
-
-                <android.support.design.widget.TabLayout
-                    android:id="@+id/tab_layout"
-                    style="@style/NavigationTab"
-                    android:layout_width="match_parent"
-                    android:layout_height="?actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:layout_gravity="bottom"
-                    app:tabMode="fixed" />
-
-            </FrameLayout>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tab_layout"
+                style="@style/NavigationTab"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:layout_gravity="bottom"
+                app:tabMode="fixed" />
 
             <FrameLayout
                 android:id="@+id/recipe_detail_container"

@@ -33,14 +33,8 @@
         </activity>
 
         <provider
-            android:name=".data.AutocompleteSuggestionProvider"
+            android:name=".data.AutocompleteContentProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.autocomplete"
-            android:enabled="true"
-            android:exported="false"
-            android:syncable="true" />
-        <provider
-            android:name=".data.AutocompleteIngredientsProvider"
-            android:authorities="za.co.mikhails.nanodegree.icook.provider.ingredients"
             android:enabled="true"
             android:exported="false"
             android:syncable="true" />

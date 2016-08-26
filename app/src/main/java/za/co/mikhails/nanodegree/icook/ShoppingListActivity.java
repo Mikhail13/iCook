@@ -21,9 +21,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
 import za.co.mikhails.nanodegree.icook.data.RecipeContract.ShoppingListEntry;
 
 public class ShoppingListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -52,14 +49,6 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         emptyImage.setAlpha(0.3f);
         TextView emptyText = (TextView) findViewById(R.id.empty_text);
         emptyText.setText(getResources().getString(R.string.search_result_shopping_list_empty_text));
-
-        AdView mAdView = (AdView) findViewById(R.id.ad_banner);
-        if (mAdView != null) {
-            AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .build();
-            mAdView.loadAd(adRequest);
-        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

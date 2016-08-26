@@ -2,5 +2,6 @@
     <dimen name="app_bar_height">240dp</dimen>
     <dimen name="activity_horizontal_margin">128dp</dimen>
     <dimen name="tab_summary_text_padding">0dp</dimen>
+    <dimen name="tab_summary_padding_top">16dp</dimen>
     <dimen name="recipe_detail_container_padding">16dp</dimen>
 </resources>

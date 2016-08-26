@@ -21,9 +21,11 @@ import za.co.mikhails.nanodegree.icook.data.ShoppingListLoader;
 class ShoppingListAdapter extends CursorAdapter {
 
     private static final NumberFormat formatter = new DecimalFormat("#0.00");
+    private String baseImageUrl;
 
     ShoppingListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        baseImageUrl = context.getString(R.string.ingredients_url);
     }
 
     @Override
@@ -40,7 +42,10 @@ class ShoppingListAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.getTag(R.id.LIST_ITEM_IMAGE);
         String imageUrl = cursor.getString(ShoppingListLoader.Query.IMAGE);
-        if (imageUrl != null || imageUrl.length() > 0) {
+        if (imageUrl != null && imageUrl.length() > 0) {
+            if (!imageUrl.startsWith(baseImageUrl)) {
+                imageUrl = baseImageUrl + imageUrl;
+            }
             Picasso.with(context).load(imageUrl).into(imageView);
         }
 
@@ -59,17 +64,21 @@ class ShoppingListAdapter extends CursorAdapter {
 
         textView = (TextView) view.getTag(R.id.LIST_ITEM_SECONDARY_TEXT);
         String amountString = cursor.getString(ShoppingListLoader.Query.AMOUNT);
-        try {
-            double amount = Double.parseDouble(amountString);
-            if (amount == (int) amount) {
-                amountString = Integer.toString((int) amount);
-            } else {
-                amountString = formatter.format(amount);
+        if (amountString != null && amountString.length() > 0) {
+            try {
+                double amount = Double.parseDouble(amountString);
+                if (amount == (int) amount) {
+                    amountString = Integer.toString((int) amount);
+                } else {
+                    amountString = formatter.format(amount);
+                }
+            } catch (NumberFormatException e) {
             }
-        } catch (NumberFormatException e) {
+        } else {
+            amountString = "";
         }
-        textView.setText(amountString + " " +
-                cursor.getString(ShoppingListLoader.Query.UNIT));
+        String unit = cursor.getString(ShoppingListLoader.Query.UNIT);
+        textView.setText(amountString + " " + (unit == null ? "" : unit));
         if (checked) {
             textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {

@@ -47,4 +47,8 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_ingredient_input_title">Add to list</string>
 
+    <string name="search_similar">Search similar</string>
+    <string name="share_google_plus">Share Google+</string>
+    <string name="share_recipe">Share...</string>
+
 </resources>

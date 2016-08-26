@@ -140,7 +140,7 @@ public class SpoonacularApi {
                 while (reader.hasNext()) {
                     reader.beginObject();
 
-                    String[] columnValues = new String[2];
+                    String[] columnValues = new String[3];
                     while (reader.hasNext()) {
                         String name = reader.nextName();
                         switch (name) {
@@ -149,6 +149,9 @@ public class SpoonacularApi {
                                 break;
                             case "name":
                                 columnValues[1] = reader.nextString();
+                                break;
+                            case "image":
+                                columnValues[2] = reader.nextString();
                                 break;
                             default:
                                 reader.skipValue();

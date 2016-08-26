@@ -40,10 +40,10 @@
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_layout"
-            style="style/NavigationTab"
+            style="@style/NavigationTab"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/transparent"
             app:tabMode="fixed" />
 
     </android.support.design.widget.AppBarLayout>

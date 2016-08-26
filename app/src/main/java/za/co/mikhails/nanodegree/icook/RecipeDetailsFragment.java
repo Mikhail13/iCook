@@ -1,6 +1,7 @@
 package za.co.mikhails.nanodegree.icook;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
@@ -15,7 +16,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -56,6 +61,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     private TabLayout tabLayout;
     private int selectedTab = 0;
     private TabLayout.OnTabSelectedListener onTabSelectedListener;
+    private String titleText;
+    private String summaryText;
+    private String toolbarImageUrl;
 
     public static RecipeDetailsFragment newInstance(long recipeId, String navigateBack, boolean isFavorite) {
         Bundle arguments = new Bundle();
@@ -183,8 +191,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         });
 
         toolbarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-
         imageView = (ImageView) activity.findViewById(R.id.toolbar_image);
+
+        setHasOptionsMenu(true);
 
         return rootView;
     }
@@ -221,6 +230,45 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.recipe_details_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share_google_plus:
+
+                return true;
+            case R.id.share_recipe:
+                if (titleText != null && summaryText != null) {
+                    shareRecipe(titleText, summaryText);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void shareRecipe(String recipeTitle, String recipeSummary) {
+        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_SUBJECT, recipeTitle);
+        share.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(recipeSummary));
+        startActivity(Intent.createChooser(share, "Share trailer"));
+    }
+
+    private void shareGooglePlus(String recipeTitle, String recipeSummary, String imageUrl) {
+//        PlusShare.Builder share = new PlusShare.Builder(this);
+//        share.setText("hello everyone!");
+//        share.addStream(selectedImage);
+//        share.setType(mime);
+//        startActivityForResult(share.getIntent(), REQ_START_SHARE);
+//
+//        Picasso.with(getContext()).load(imageUrl).get()
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return RecipeDetailsLoader.newInstanceForRecipeId(getContext(), recipeId);
     }
@@ -230,17 +278,19 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         if (isAdded() && cursor != null && cursor.moveToFirst()) {
 
             if (toolbarLayout != null) {
-                toolbarLayout.setTitle(cursor.getString(RecipeDetailsLoader.Query.TITLE));
+                titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
+                toolbarLayout.setTitle(titleText);
             }
 
-            tabSummaryFragment.setText(cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION));
+            summaryText = cursor.getString(RecipeDetailsLoader.Query.DESCRIPTION);
+            tabSummaryFragment.setText(summaryText);
 
             if (tabIngredientsFragment.isAdded()) {
                 tabIngredientsFragment.getLoaderManager().getLoader(0).forceLoad();
             }
 
             if (imageView != null) {
-                String toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
+                toolbarImageUrl = cursor.getString(RecipeDetailsLoader.Query.IMAGE_URL);
                 if (toolbarImageUrl != null && toolbarImageUrl.length() > 0) {
                     Picasso.with(getContext()).load(toolbarImageUrl).into(imageView);
                 }
