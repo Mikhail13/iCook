@@ -4,7 +4,11 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +21,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,8 +31,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.plus.PlusShare;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.MessageFormat;
 
 import za.co.mikhails.nanodegree.icook.data.IngredientsListLoader;
@@ -40,6 +48,7 @@ import za.co.mikhails.nanodegree.icook.data.SearchResultLoader;
 import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 
 public class RecipeDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = RecipeDetailsFragment.class.getSimpleName();
 
     private static final String ADD_TO_FAVORITES = "add_to_favorites";
     private static final String ADD_TO_SHOPPING_LIST = "add_to_shopping_list";
@@ -48,6 +57,8 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     private static final String SAVED_IS_FAVORITE = "saved_is_favorite";
     private static final String SAVED_NAVIGATE_BACK = "saved_navigate_back";
     private static final String SAVED_SELECTED_TAB = "saved_selected_tab";
+
+    private static final int REQ_START_SHARE = 2;
 
     private long recipeId;
     private boolean isFavorite;
@@ -238,7 +249,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share_google_plus:
-
+                if (titleText != null && summaryText != null && toolbarImageUrl != null) {
+                    shareGooglePlus(titleText, toolbarImageUrl);
+                }
                 return true;
             case R.id.share_recipe:
                 if (titleText != null && summaryText != null) {
@@ -258,14 +271,34 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         startActivity(Intent.createChooser(share, "Share trailer"));
     }
 
-    private void shareGooglePlus(String recipeTitle, String recipeSummary, String imageUrl) {
-//        PlusShare.Builder share = new PlusShare.Builder(this);
-//        share.setText("hello everyone!");
-//        share.addStream(selectedImage);
-//        share.setType(mime);
-//        startActivityForResult(share.getIntent(), REQ_START_SHARE);
-//
-//        Picasso.with(getContext()).load(imageUrl).get()
+    private void shareGooglePlus(final String recipeTitle, final String imageUrl) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(final Void... params) {
+                Uri uri = null;
+                try {
+                    uri = getImageUri(Picasso.with(getContext()).load(imageUrl).get(), recipeTitle);
+                } catch (IOException e) {
+                    Log.e(TAG, "Unable to load image: " + imageUrl);
+                }
+                PlusShare.Builder share = new PlusShare.Builder(getContext());
+                share.setText(recipeTitle);
+                if (uri != null) {
+                    share.addStream(uri);
+                    share.setType("image/jpeg");
+                }
+                startActivityForResult(share.getIntent(), REQ_START_SHARE);
+
+                return null;
+            }
+        }.execute();
+    }
+
+    public Uri getImageUri(Bitmap bitmap, String title) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, "Title", null);
+        return Uri.parse(path);
     }
 
     @Override
