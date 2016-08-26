@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -33,8 +33,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.plus.PlusShare;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 
@@ -171,7 +173,7 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
                     }
                 }
             };
-            tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+            tabLayout.setOnTabSelectedListener(onTabSelectedListener);
         }
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -272,33 +274,46 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     }
 
     private void shareGooglePlus(final String recipeTitle, final String imageUrl) {
-        new AsyncTask<Void, Void, Void>() {
+        Picasso.with(getContext()).load(imageUrl).into(new Target() {
             @Override
-            protected Void doInBackground(final Void... params) {
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 Uri uri = null;
                 try {
-                    uri = getImageUri(Picasso.with(getContext()).load(imageUrl).get(), recipeTitle);
+                    uri = getImageUri(bitmap);
                 } catch (IOException e) {
                     Log.e(TAG, "Unable to load image: " + imageUrl);
                 }
-                PlusShare.Builder share = new PlusShare.Builder(getContext());
-                share.setText(recipeTitle);
                 if (uri != null) {
+                    PlusShare.Builder share = new PlusShare.Builder(getContext());
+                    share.setText(recipeTitle);
                     share.addStream(uri);
                     share.setType("image/jpeg");
+                    startActivityForResult(share.getIntent(), REQ_START_SHARE);
+                } else {
+                    Toast.makeText(getContext(), R.string.toast_share_googleplus_error, Toast.LENGTH_SHORT).show();
                 }
-                startActivityForResult(share.getIntent(), REQ_START_SHARE);
-
-                return null;
             }
-        }.execute();
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Toast.makeText(getContext(), R.string.toast_share_googleplus_error, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
-    public Uri getImageUri(Bitmap bitmap, String title) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, "Title", null);
-        return Uri.parse(path);
+    public Uri getImageUri(Bitmap bitmap) throws IOException {
+        File cachePath = new File(getContext().getCacheDir(), "images");
+        cachePath.mkdirs();
+        File file = new File(cachePath, "image.jpeg");
+        FileOutputStream outputStream = new FileOutputStream(file);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        outputStream.close();
+        return FileProvider.getUriForFile(getContext(), "za.co.mikhails.nanodegree.fileprovider", file);
     }
 
     @Override

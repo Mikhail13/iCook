@@ -50,5 +50,6 @@
     <string name="search_similar">Search similar</string>
     <string name="share_google_plus">Share Google+</string>
     <string name="share_recipe">Share...</string>
+    <string name="toast_share_googleplus_error">Unable to share to Google+</string>
 
 </resources>

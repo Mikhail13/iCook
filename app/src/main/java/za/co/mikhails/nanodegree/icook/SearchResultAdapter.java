@@ -26,7 +26,7 @@ class SearchResultAdapter extends CursorAdapter {
 
     @SuppressLint("StringFormatMatches")
     private void init(Context context) {
-        secondaryText = context.getString(R.string.list_item_search_result_secondary_text, null);
+        secondaryText = context.getString(R.string.list_item_search_result_secondary_text);
         imageWidthXHeight = String.valueOf(context.getResources().getDimensionPixelSize(R.dimen.search_result_image_width) + "x" + context.getResources().getDimensionPixelSize(R.dimen.search_result_image_height));
     }
 

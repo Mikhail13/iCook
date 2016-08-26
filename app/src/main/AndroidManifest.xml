@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -46,10 +45,10 @@
             android:exported="false"
             android:syncable="true" />
         <provider
-            android:name=".data.BitmapFileProvider"
-            android:authorities="za.co.mikhails.nanodegree.icook.provider.bitmap"
-            android:enabled="true"
-            android:grantUriPermissions="true">
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="za.co.mikhails.nanodegree.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
