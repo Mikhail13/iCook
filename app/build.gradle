@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-//    signingConfigs {
-//        config {
-//            keyAlias 'icook'
-//            keyPassword 'password'
-//            storeFile file('$rootDir/signing/keystore.jks')
-//            storePassword 'password'
-//        }
-//    }
+    signingConfigs {
+        config {
+            keyAlias 'icook'
+            keyPassword 'password'
+            storeFile file('$rootDir/signing/keystore.jks')
+            storePassword 'password'
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
     defaultConfig {
@@ -24,7 +24,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            signingConfig signingConfigs.config
+            signingConfig signingConfigs.config
         }
     }
 }
