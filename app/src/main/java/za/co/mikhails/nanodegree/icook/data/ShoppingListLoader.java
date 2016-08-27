@@ -8,10 +8,6 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract.ShoppingListEntry;
 
 public class ShoppingListLoader extends CursorLoader {
 
-    public static ShoppingListLoader newInstance(Context context) {
-        return new ShoppingListLoader(context, ShoppingListEntry.CONTENT_LIST_URI, null, null);
-    }
-
     private ShoppingListLoader(Context context, Uri uri, String selection, String[] selectionArgs) {
         super(context, uri, Query.PROJECTION, selection, selectionArgs, null);
     }

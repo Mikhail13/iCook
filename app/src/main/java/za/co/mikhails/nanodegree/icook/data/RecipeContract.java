@@ -10,9 +10,6 @@ public class RecipeContract {
     public static final String CONTENT_AUTHORITY = "za.co.mikhails.nanodegree.icook.provider.recipe";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
-    public static final String FAVORITES_CONTENT_AUTHORITY = "za.co.mikhails.nanodegree.icook.provider.favorites";
-    public static final Uri FAVORITES_BASE_CONTENT_URI = Uri.parse("content://" + FAVORITES_CONTENT_AUTHORITY);
-
     public static final String PATH_SEARCH_RESULT = "search_result";
     public static final String PATH_RECIPE_DETAILS = "details";
     public static final String PATH_RECIPE = PATH_RECIPE_DETAILS + "/#";
@@ -94,17 +91,12 @@ public class RecipeContract {
         public static Uri buildResultUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        public static Uri buildItemUri(long recipeId) {
-            return ContentUris.withAppendedId(CONTENT_URI, recipeId);
-        }
     }
 
     public static final class InstructionsEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_INSTRUCTIONS).build();
         public static final Uri CONTENT_LIST_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_INSTRUCTIONS).build();
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INSTRUCTIONS;
 
         public static final String TABLE_NAME = "instructions";
 
@@ -113,20 +105,11 @@ public class RecipeContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_NUMBER = "number";
         public static final String COLUMN_STEP = "step";
-
-        public static Uri buildResultUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        public static Uri buildItemUri(long recipeId) {
-            return ContentUris.withAppendedId(CONTENT_URI, recipeId);
-        }
     }
 
     public static final class FavoritesEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITES).build();
-        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
 
         public static final String TABLE_NAME = "favorites";
 
@@ -169,10 +152,6 @@ public class RecipeContract {
 
         public static Uri buildResultUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-
-        public static Uri buildUri(long recipeId) {
-            return ContentUris.withAppendedId(CONTENT_URI, recipeId);
         }
     }
 

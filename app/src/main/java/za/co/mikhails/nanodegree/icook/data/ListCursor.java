@@ -62,9 +62,4 @@ public class ListCursor extends AbstractCursor {
         list.add(columnValues);
         onChange(true);
     }
-
-    public void clear() {
-        list.clear();
-        onChange(true);
-    }
 }

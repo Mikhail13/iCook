@@ -48,8 +48,9 @@ class InstructionsListAdapter extends CursorAdapter {
         }
 
         textView = (TextView) view.getTag(R.id.LIST_ITEM_SECONDARY_TEXT);
-        textView.setText(cursor.getString(InstructionsListLoader.Query.NUMBER) + ". " +
-                cursor.getString(InstructionsListLoader.Query.STEP));
+        String text = cursor.getString(InstructionsListLoader.Query.NUMBER) + ". " +
+                cursor.getString(InstructionsListLoader.Query.STEP);
+        textView.setText(text);
 
         long id = cursor.getLong(InstructionsListLoader.Query.ID);
         view.setTag(R.id.INSTRUCTION_ID, id);

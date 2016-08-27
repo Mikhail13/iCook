@@ -3,6 +3,7 @@ package za.co.mikhails.nanodegree.icook;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ import java.text.NumberFormat;
 import za.co.mikhails.nanodegree.icook.data.IngredientsListLoader;
 
 class IngredientsListAdapter extends CursorAdapter {
-
+    private static final String TAG = IngredientsListAdapter.class.getSimpleName();
     private static final NumberFormat formatter = new DecimalFormat("#0.00");
 
     IngredientsListAdapter(Context context, Cursor c, int flags) {
@@ -37,7 +38,7 @@ class IngredientsListAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.getTag(R.id.LIST_ITEM_IMAGE);
         String imageUrl = cursor.getString(IngredientsListLoader.Query.IMAGE);
-        if (imageUrl != null || imageUrl.length() > 0) {
+        if (imageUrl != null && imageUrl.length() > 0) {
             Picasso.with(context).load(imageUrl).into(imageView);
         }
 
@@ -54,9 +55,10 @@ class IngredientsListAdapter extends CursorAdapter {
                 amountString = formatter.format(amount);
             }
         } catch (NumberFormatException e) {
+            Log.e(TAG, "Unable to parse amount: " + amountString, e);
         }
-        textView.setText(amountString + " " +
-                cursor.getString(IngredientsListLoader.Query.UNIT));
+        amountString += " " + cursor.getString(IngredientsListLoader.Query.UNIT);
+        textView.setText(amountString);
 
         long id = cursor.getLong(IngredientsListLoader.Query.ID);
         view.setTag(R.id.INGREDIENT_ID, id);

@@ -34,24 +34,30 @@ public class RecipeDetailsActivity extends AppCompatActivity {
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Class parenClass = navigateBack.equals(RecipeListActivity.class.getSimpleName()) ? RecipeListActivity.class : AdvancedSearchResultActivity.class;
+                    NavUtils.navigateUpTo(RecipeDetailsActivity.this, new Intent(RecipeDetailsActivity.this, parenClass));
+                }
+            });
+            setSupportActionBar(toolbar);
+        }
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Class parenClass = navigateBack.equals(RecipeListActivity.class.getSimpleName()) ? RecipeListActivity.class : AdvancedSearchResultActivity.class;
-                NavUtils.navigateUpTo(RecipeDetailsActivity.this, new Intent(RecipeDetailsActivity.this, parenClass));
-            }
-        });
 
         NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.nested_scroll_view);
-        nestedScrollView.setFillViewport(true);
+        if (nestedScrollView != null) {
+            nestedScrollView.setFillViewport(true);
+        }
 
         View view = findViewById(android.R.id.content);
-        view.setAlpha(0);
-        view.animate().alpha(1);
+        if (view != null) {
+            view.setAlpha(0);
+            view.animate().alpha(1);
+        }
     }
 }

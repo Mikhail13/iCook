@@ -25,8 +25,6 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract;
 
 public class SpoonacularApi {
 
-    private static final String TAG = SpoonacularApi.class.getSimpleName();
-
     public static final String PARAM_TYPE = "type";
     public static final String PARAM_CUISINE = "cuisine";
     public static final String PARAM_DIET = "diet";
@@ -41,7 +39,7 @@ public class SpoonacularApi {
     public static final String PARAM_MAX_PROTEIN = "maxProtein";
     public static final String PARAM_INCLUDE_INGREDIENTS = "includeIngredients";
     public static final String PARAM_EXCLUDE_INGREDIENTS = "excludeIngredients";
-
+    private static final String TAG = SpoonacularApi.class.getSimpleName();
     private static final int PARSE_RECIPE_SEARCH_RESULT = 1;
     private static final int PARSE_RECIPE_DETAILS = 2;
     private static final int PARSE_RECIPE_SUMMARY = 3;

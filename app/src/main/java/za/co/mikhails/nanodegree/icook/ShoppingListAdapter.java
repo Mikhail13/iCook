@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import java.text.NumberFormat;
 import za.co.mikhails.nanodegree.icook.data.ShoppingListLoader;
 
 class ShoppingListAdapter extends CursorAdapter {
-
+    private static final String TAG = ShoppingListAdapter.class.getSimpleName();
     private static final NumberFormat formatter = new DecimalFormat("#0.00");
     private String baseImageUrl;
 
@@ -73,12 +74,14 @@ class ShoppingListAdapter extends CursorAdapter {
                     amountString = formatter.format(amount);
                 }
             } catch (NumberFormatException e) {
+                Log.e(TAG, "Unable to parse amount: " + amountString, e);
             }
         } else {
             amountString = "";
         }
         String unit = cursor.getString(ShoppingListLoader.Query.UNIT);
-        textView.setText(amountString + " " + (unit == null ? "" : unit));
+        amountString += " " + (unit == null ? "" : unit);
+        textView.setText(amountString);
         if (checked) {
             textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {

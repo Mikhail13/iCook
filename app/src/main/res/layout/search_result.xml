@@ -24,6 +24,7 @@
             android:layout_width="160dp"
             android:layout_height="160dp"
             android:layout_centerHorizontal="true"
+            android:contentDescription="@string/search_result_empty_image"
             app:srcCompat="@drawable/ic_search_alpha" />
 
         <TextView

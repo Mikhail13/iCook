@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import za.co.mikhails.nanodegree.icook.spoonacular.SpoonacularApi;
@@ -24,42 +23,29 @@ public class AdvancedSearchActivity extends AppCompatActivity {
         setupSingleSelectionEditText(R.id.cuisine, R.array.cuisine_array);
         setupSingleSelectionEditText(R.id.diet, R.array.diet_array);
         setupSingleSelectionEditText(R.id.intolerances, R.array.intolerances_array);
-
-        //TODO: multiple choice
-
     }
 
     private void setupSingleSelectionEditText(int editTextResId, int arrayResId) {
         final EditText editText = (EditText) findViewById(editTextResId);
-        final ListPopupWindow listPopupWindow = new ListPopupWindow(this);
-        final String[] stringArray = getResources().getStringArray(arrayResId);
-        listPopupWindow.setAdapter(new ArrayAdapter(this, R.layout.list_item_popup_hint, stringArray));
-        listPopupWindow.setAnchorView(editText);
+        if (editText != null) {
+            final ListPopupWindow listPopupWindow = new ListPopupWindow(this);
+            final String[] stringArray = getResources().getStringArray(arrayResId);
+            listPopupWindow.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_popup_hint, stringArray));
+            listPopupWindow.setAnchorView(editText);
 
-        listPopupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                editText.setText("");
-                editText.append(stringArray[position]);
-                listPopupWindow.dismiss();
-            }
-        });
-        editText.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                listPopupWindow.show();
-            }
-        });
-
-    }
-
-    private void setupSpinner(int spinnerResId, int arrayResId) {
-        Spinner spinner;
-        spinner = (Spinner) findViewById(spinnerResId);
-        if (spinner != null) {
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                    arrayResId, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
+            listPopupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    editText.setText("");
+                    editText.append(stringArray[position]);
+                    listPopupWindow.dismiss();
+                }
+            });
+            editText.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    listPopupWindow.show();
+                }
+            });
         }
     }
 
@@ -91,9 +77,11 @@ public class AdvancedSearchActivity extends AppCompatActivity {
 
     private void addBundleValue(Bundle bundle, String paramKey, int resId) {
         TextView textView = (TextView) findViewById(resId);
-        String value = textView.getText().toString().trim();
-        if (value.length() > 0) {
-            bundle.putString(paramKey, value);
+        if (textView != null) {
+            String value = textView.getText().toString().trim();
+            if (value.length() > 0) {
+                bundle.putString(paramKey, value);
+            }
         }
     }
 }

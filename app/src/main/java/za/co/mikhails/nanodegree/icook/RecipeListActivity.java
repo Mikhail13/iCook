@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,12 +36,8 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
 
     private static final String TAG = RecipeListActivity.class.getSimpleName();
     private static final int SEARCH_RESULT_LOADER = 1;
-    private static final String SEARCH_QUERY = "search_query";
-    private View progressIndicator;
-    private ListView searchResult;
     private SearchResultAdapter searchResultAdapter;
     private CursorLoader searchResultLoader;
-    private Parcelable restoreListViewState;
     private SearchView searchView;
     private boolean twoPane;
 
@@ -55,21 +50,27 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        if (drawer != null) {
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+        }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(this);
+        }
 
-        searchResult = (ListView) findViewById(R.id.list_view);
-        searchResultAdapter = new SearchResultAdapter(this, null, 0);
-        searchResult.setAdapter(searchResultAdapter);
-        searchResult.setOnItemSelectedListener(this);
-        searchResult.setOnItemClickListener(this);
-        searchResult.setOnScrollListener(this);
-        searchResult.setEmptyView(findViewById(R.id.empty_view));
+        ListView searchResult = (ListView) findViewById(R.id.list_view);
+        if (searchResult != null) {
+            searchResultAdapter = new SearchResultAdapter(this, null, 0);
+            searchResult.setAdapter(searchResultAdapter);
+            searchResult.setOnItemSelectedListener(this);
+            searchResult.setOnItemClickListener(this);
+            searchResult.setOnScrollListener(this);
+            searchResult.setEmptyView(findViewById(R.id.empty_view));
+        }
 
         AdView mAdView = (AdView) findViewById(R.id.ad_banner);
         if (mAdView != null) {
@@ -131,14 +132,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader == searchResultLoader) {
-
             searchResultAdapter.swapCursor(data);
-
-            // TODO: Save/restore list view state
-//            if (restoreListViewState != null) {
-//                searchResult.onRestoreInstanceState(restoreListViewState);
-//                restoreListViewState = null;
-//            }
         }
     }
 
@@ -169,7 +163,7 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -189,7 +183,9 @@ public class RecipeListActivity extends AppCompatActivity implements LoaderManag
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        if (drawer != null) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
 

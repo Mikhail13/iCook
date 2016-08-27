@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -16,15 +17,12 @@ public class AutocompleteContentProvider extends ContentProvider {
     private static final String TAG = AutocompleteContentProvider.class.getSimpleName();
 
     private static final String CONTENT_AUTHORITY = "za.co.mikhails.nanodegree.icook.provider.autocomplete";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     private static final String PATH_SUGGESTION = "search_suggest_query";
     private static final String SUGGESTION_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SUGGESTION;
-
     private static final String PATH_INGREDIENTS = "ingredients";
-    private static final String INGREDIENTS_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INGREDIENTS;
-
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final Uri INGREDIENTS_CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_INGREDIENTS).build();
-
+    private static final String INGREDIENTS_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INGREDIENTS;
     private static final String ID_COLUMN = "_id";
     private static final int DEFAULT_LIMIT = 10;
 
@@ -46,7 +44,7 @@ public class AutocompleteContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String query = uri.getLastPathSegment();
 
         if (!SearchManager.SUGGEST_URI_PATH_QUERY.equals(query)) {
@@ -78,7 +76,7 @@ public class AutocompleteContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         switch (uriMatcher.match(uri)) {
             case SUGGESTION:
                 return SUGGESTION_TYPE;
@@ -91,17 +89,17 @@ public class AutocompleteContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         return null;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
 

@@ -21,7 +21,7 @@
                 android:id="@+id/meal_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Meal type" />
+                android:hint="@string/advanced_search_meal_type" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -32,7 +32,7 @@
                 android:id="@+id/cuisine"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Cuisine" />
+                android:hint="@string/advanced_search_cuisine" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -43,7 +43,7 @@
                 android:id="@+id/diet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Diet" />
+                android:hint="@string/advanced_search_diet" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -54,13 +54,14 @@
                 android:id="@+id/intolerances"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Intolerances" />
+                android:hint="@string/advanced_search_intolerances" />
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -71,8 +72,8 @@
                     android:id="@+id/min_calories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Min. calories" />
+                    android:hint="@string/advanced_search_min_calories"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -84,8 +85,8 @@
                     android:id="@+id/max_calories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Max. calories" />
+                    android:hint="@string/advanced_search_max_calories"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -93,7 +94,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -104,8 +106,8 @@
                     android:id="@+id/min_carbs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Min. carbs" />
+                    android:hint="@string/advanced_search_min_carbs"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -117,8 +119,8 @@
                     android:id="@+id/max_carbs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Max. carbs" />
+                    android:hint="@string/advanced_search_max_carbs"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -126,7 +128,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -137,8 +140,8 @@
                     android:id="@+id/min_fat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Min. fat" />
+                    android:hint="@string/advanced_search_min_fat"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -150,8 +153,8 @@
                     android:id="@+id/max_fat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Max. fat" />
+                    android:hint="@string/advanced_search_max_fat"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -159,7 +162,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -170,8 +174,8 @@
                     android:id="@+id/min_protein"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Min. protein" />
+                    android:hint="@string/advanced_search_min_protein"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -183,8 +187,8 @@
                     android:id="@+id/max_protein"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:hint="Max. protein" />
+                    android:hint="@string/advanced_search_max_protein"
+                    android:inputType="number" />
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
@@ -198,7 +202,7 @@
                 android:id="@+id/include_ingredients"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Include ingredients" />
+                android:hint="@string/advanced_search_include_ingredients" />
         </android.support.design.widget.TextInputLayout>
 
 
@@ -210,14 +214,14 @@
                 android:id="@+id/exclude_ingredients"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Exclude ingredients" />
+                android:hint="@string/advanced_search_exclude_ingredients" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="searchSubmit"
-            android:text="SUBMIT" />
+            android:text="@string/advanced_search_submit" />
 
     </LinearLayout>
 </ScrollView>

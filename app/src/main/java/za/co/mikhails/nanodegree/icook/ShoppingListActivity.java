@@ -6,7 +6,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -27,37 +26,43 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
     private static final String TAG = ShoppingListActivity.class.getSimpleName();
-    private ListView shoppingListView;
     private ShoppingListAdapter shoppingListAdapter;
     private CursorLoader shoppingListLoader;
-    private Parcelable restoreListViewState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shopping_list);
 
-        shoppingListView = (ListView) findViewById(R.id.list_view);
-        shoppingListAdapter = new ShoppingListAdapter(this, null, 0);
-        shoppingListView.setAdapter(shoppingListAdapter);
-        shoppingListView.setOnItemSelectedListener(this);
-        shoppingListView.setOnItemClickListener(this);
-        shoppingListView.setEmptyView(findViewById(R.id.empty_view));
+        ListView shoppingListView = (ListView) findViewById(R.id.list_view);
+        if (shoppingListView != null) {
+            shoppingListAdapter = new ShoppingListAdapter(this, null, 0);
+            shoppingListView.setAdapter(shoppingListAdapter);
+            shoppingListView.setOnItemSelectedListener(this);
+            shoppingListView.setOnItemClickListener(this);
+            shoppingListView.setEmptyView(findViewById(R.id.empty_view));
+        }
 
         ImageView emptyImage = (ImageView) findViewById(R.id.empty_image);
-        emptyImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_shopping_cart_black));
-        emptyImage.setAlpha(0.3f);
+        if (emptyImage != null) {
+            emptyImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_shopping_cart_black));
+            emptyImage.setAlpha(0.3f);
+        }
         TextView emptyText = (TextView) findViewById(R.id.empty_text);
-        emptyText.setText(getResources().getString(R.string.search_result_shopping_list_empty_text));
+        if (emptyText != null) {
+            emptyText.setText(getResources().getString(R.string.search_result_shopping_list_empty_text));
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment dialogFragment = new IngredientInputDialogFragment();
-                dialogFragment.show(getSupportFragmentManager(), "ingredient");
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogFragment dialogFragment = new IngredientInputDialogFragment();
+                    dialogFragment.show(getSupportFragmentManager(), "ingredient");
+                }
+            });
+        }
 
         getLoaderManager().restartLoader(0, null, this);
     }
@@ -101,14 +106,7 @@ public class ShoppingListActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader == shoppingListLoader) {
-
             shoppingListAdapter.swapCursor(data);
-
-            // TODO: Save/restore list view state
-//            if (restoreListViewState != null) {
-//                shoppingListView.onRestoreInstanceState(restoreListViewState);
-//                restoreListViewState = null;
-//            }
         }
     }
 

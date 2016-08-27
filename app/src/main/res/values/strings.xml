@@ -32,7 +32,7 @@
     <string name="nav_favorites">Favorites</string>
     <string name="nav_shopping_list">Shopping List</string>
 
-    <string name="adv_search_meal_type">Select Meal Type...</string>
+    <string name="adv_search_meal_type">Select Meal Type…</string>
     <string name="title_activity_recipe_details">Recipe Details</string>
     <string name="title_activity_favorites_details">Favorites</string>
     <string name="title_activity_shopping_list">Shopping List</string>
@@ -40,6 +40,7 @@
     <string name="toast_add_to_favorites">Added \"{0}\" to favorites.</string>
     <string name="toast_add_to_shopping_list">Ingredients added to the shopping list.</string>
     <string name="search_result_empty_text">Search for recipes</string>
+    <string name="search_result_empty_image">Search for recipes image</string>
     <string name="search_result_favorites_empty_text">No favorites</string>
     <string name="search_result_shopping_list_empty_text">List is empty</string>
     <string name="tab_no_data_text">No data</string>
@@ -49,7 +50,28 @@
 
     <string name="search_similar">Search similar</string>
     <string name="share_google_plus">Share Google+</string>
-    <string name="share_recipe">Share...</string>
+    <string name="share_recipe">Share…</string>
     <string name="toast_share_googleplus_error">Unable to share to Google+</string>
+
+    <string name="advanced_search_meal_type">Meal type</string>
+    <string name="advanced_search_cuisine">Cuisine</string>
+    <string name="advanced_search_diet">Diet</string>
+    <string name="advanced_search_intolerances">Intolerances</string>
+    <string name="advanced_search_min_calories">Min. calories</string>
+    <string name="advanced_search_max_calories">Max. calories</string>
+    <string name="advanced_search_min_carbs">Min. carbs</string>
+    <string name="advanced_search_max_carbs">Max. carbs</string>
+    <string name="advanced_search_min_fat">Min. fat</string>
+    <string name="advanced_search_max_fat">Max. fat</string>
+    <string name="advanced_search_min_protein">Min. protein</string>
+    <string name="advanced_search_max_protein">Max. protein</string>
+    <string name="advanced_search_include_ingredients">Include ingredients</string>
+    <string name="advanced_search_exclude_ingredients">Exclude ingredients</string>
+    <string name="advanced_search_submit">SUBMIT</string>
+
+    <string name="recipe_details_image_content_description">Big recipe image</string>
+    <string name="dialog_enter_ingredient_name">Enter ingredient name</string>
+    <string name="list_item_ingredient_image_content_description">Ingredient image</string>
+    <string name="list_item_recipe_image_content_description">Recipe image</string>
 
 </resources>

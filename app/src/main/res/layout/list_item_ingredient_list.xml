@@ -11,6 +11,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:contentDescription="@string/list_item_ingredient_image_content_description"
         android:scaleType="fitXY" />
 
     <TextView

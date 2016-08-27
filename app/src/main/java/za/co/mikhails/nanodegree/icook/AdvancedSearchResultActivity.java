@@ -7,9 +7,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,16 +22,11 @@ import za.co.mikhails.nanodegree.icook.spoonacular.SyncAdapter;
 public class AdvancedSearchResultActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
-    private static final String TAG = AdvancedSearchResultActivity.class.getSimpleName();
     public static final String VALUES_BUNDLE = "values_bundle";
+    private static final String TAG = AdvancedSearchResultActivity.class.getSimpleName();
     private static final int SEARCH_RESULT_LOADER = 1;
-    private static final String SEARCH_QUERY = "search_query";
-    private View progressIndicator;
-    private ListView searchResult;
     private SearchResultAdapter searchResultAdapter;
     private CursorLoader searchResultLoader;
-    private Parcelable restoreListViewState;
-    private SearchView searchView;
     private boolean twoPane;
 
     @Override
@@ -41,11 +34,14 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result);
 
-        searchResult = (ListView) findViewById(R.id.list_view);
-        searchResultAdapter = new SearchResultAdapter(this, null, 0);
-        searchResult.setAdapter(searchResultAdapter);
-        searchResult.setOnItemSelectedListener(this);
-        searchResult.setOnItemClickListener(this);
+        ListView searchResult = (ListView) findViewById(R.id.list_view);
+        if (searchResult != null) {
+            searchResultAdapter = new SearchResultAdapter(this, null, 0);
+            searchResult.setAdapter(searchResultAdapter);
+            searchResult.setOnItemSelectedListener(this);
+            searchResult.setOnItemClickListener(this);
+            searchResult.setEmptyView(findViewById(R.id.empty_view));
+        }
 
         AdView mAdView = (AdView) findViewById(R.id.ad_banner);
         if (mAdView != null) {
@@ -55,25 +51,16 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
             mAdView.loadAd(adRequest);
         }
 
-//        progressIndicator = findViewById(R.id.progress_indicator);
-//        searchResult.setEmptyView(progressIndicator);
-        searchResult.setEmptyView(findViewById(R.id.empty_view));
-
-
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
 
         Bundle valuesBundle = getIntent().getBundleExtra(VALUES_BUNDLE);
         SyncAdapter.syncRecipeListImmediately(this, valuesBundle);
 
-//        Bundle bundle = new Bundle();
-//        bundle.putString(SEARCH_QUERY, query);
         getLoaderManager().restartLoader(SEARCH_RESULT_LOADER, null, this);
 
         if (findViewById(R.id.recipe_detail_container) != null) {
             twoPane = true;
         }
-
-        //TODO: show progress bar
     }
 
     @Override
@@ -82,8 +69,6 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
             Uri baseContentUri = RecipeContract.BASE_CONTENT_URI;
             Uri.Builder builder = baseContentUri.buildUpon()
                     .appendPath(RecipeContract.PATH_SEARCH_RESULT);
-//                    .appendQueryParameter("query", query);
-//            ContentUris.appendId(builder, query);
             searchResultLoader = new CursorLoader(this, builder.build(), null, null, null, null);
             return searchResultLoader;
         }
@@ -93,14 +78,7 @@ public class AdvancedSearchResultActivity extends AppCompatActivity implements L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader == searchResultLoader) {
-
             searchResultAdapter.swapCursor(data);
-
-            // TODO: Save/restore list view state
-//            if (restoreListViewState != null) {
-//                searchResult.onRestoreInstanceState(restoreListViewState);
-//                restoreListViewState = null;
-//            }
         }
     }
 

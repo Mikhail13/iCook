@@ -18,8 +18,7 @@
             android:id="@+id/ingredient_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:hint="Enter ingredient name" />
+            android:hint="@string/dialog_enter_ingredient_name" />
 
     </android.support.design.widget.TextInputLayout>
 

@@ -152,56 +152,60 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
                     super.onTabSelected(tab);
 
                     selectedTab = tab.getPosition();
-                    switch (selectedTab) {
-                        case 0:
-                            if (isFavorite) {
-                                fab.setVisibility(View.GONE);
-                            } else {
+                    if (fab != null) {
+                        switch (selectedTab) {
+                            case 0:
+                                if (isFavorite) {
+                                    fab.setVisibility(View.GONE);
+                                } else {
+                                    fab.setVisibility(View.VISIBLE);
+                                    fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_star_white));
+                                    fab.setTag(ADD_TO_FAVORITES);
+                                }
+                                break;
+                            case 1:
                                 fab.setVisibility(View.VISIBLE);
-                                fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_star_white));
-                                fab.setTag(ADD_TO_FAVORITES);
-                            }
-                            break;
-                        case 1:
-                            fab.setVisibility(View.VISIBLE);
-                            fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_shopping_cart_white));
-                            fab.setTag(ADD_TO_SHOPPING_LIST);
-                            break;
-                        case 2:
-                            fab.setVisibility(View.GONE);
-                            break;
+                                fab.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_shopping_cart_white));
+                                fab.setTag(ADD_TO_SHOPPING_LIST);
+                                break;
+                            case 2:
+                                fab.setVisibility(View.GONE);
+                                break;
+                        }
                     }
                 }
             };
             tabLayout.setOnTabSelectedListener(onTabSelectedListener);
         }
 
-        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (view != null && view.getTag() != null && view.getTag() instanceof String) {
-                    String title;
-                    String toastText = null;
-                    switch ((String) view.getTag()) {
-                        case ADD_TO_FAVORITES:
-                            title = copyRecipeToFavorites(recipeId);
-                            if (title != null) {
-                                toastText = MessageFormat.format(getString(R.string.toast_add_to_favorites), title);
-                            }
-                            break;
-                        case ADD_TO_SHOPPING_LIST:
-                            if (copyIngredientsToList(recipeId)) {
-                                toastText = getString(R.string.toast_add_to_shopping_list);
-                            }
-                            break;
-                    }
-                    if (toastText != null) {
-                        Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
+        fab = (FloatingActionButton) activity.findViewById(R.id.fab);
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (view != null && view.getTag() != null && view.getTag() instanceof String) {
+                        String title;
+                        String toastText = null;
+                        switch ((String) view.getTag()) {
+                            case ADD_TO_FAVORITES:
+                                title = copyRecipeToFavorites(recipeId);
+                                if (title != null) {
+                                    toastText = MessageFormat.format(getString(R.string.toast_add_to_favorites), title);
+                                }
+                                break;
+                            case ADD_TO_SHOPPING_LIST:
+                                if (copyIngredientsToList(recipeId)) {
+                                    toastText = getString(R.string.toast_add_to_shopping_list);
+                                }
+                                break;
+                        }
+                        if (toastText != null) {
+                            Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
         toolbarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
         imageView = (ImageView) activity.findViewById(R.id.toolbar_image);
@@ -308,12 +312,14 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
 
     public Uri getImageUri(Bitmap bitmap) throws IOException {
         File cachePath = new File(getContext().getCacheDir(), "images");
-        cachePath.mkdirs();
-        File file = new File(cachePath, "image.jpeg");
-        FileOutputStream outputStream = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        outputStream.close();
-        return FileProvider.getUriForFile(getContext(), "za.co.mikhails.nanodegree.fileprovider", file);
+        if (cachePath.exists() || cachePath.mkdirs()) {
+            File file = new File(cachePath, "image.jpeg");
+            FileOutputStream outputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.close();
+            return FileProvider.getUriForFile(getContext(), "za.co.mikhails.nanodegree.fileprovider", file);
+        }
+        return null;
     }
 
     @Override
@@ -325,8 +331,8 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if (isAdded() && cursor != null && cursor.moveToFirst()) {
 
+            titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
             if (toolbarLayout != null) {
-                titleText = cursor.getString(RecipeDetailsLoader.Query.TITLE);
                 toolbarLayout.setTitle(titleText);
             }
 

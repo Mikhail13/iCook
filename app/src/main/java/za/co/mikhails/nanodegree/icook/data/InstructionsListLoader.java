@@ -8,15 +8,15 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract.InstructionsEntry;
 
 public class InstructionsListLoader extends CursorLoader {
 
+    private InstructionsListLoader(Context context, Uri uri, String selection, String[] selectionArgs, String orderBy) {
+        super(context, uri, Query.PROJECTION, selection, selectionArgs, orderBy);
+    }
+
     public static InstructionsListLoader newInstanceForRecipeId(Context context, long recipeId) {
         String selection = InstructionsEntry.COLUMN_RECIPE_ID + "=?";
         String[] selectionArgs = {String.valueOf(recipeId)};
         String orderBy = InstructionsEntry.COLUMN_NAME + ",ABS(" + InstructionsEntry.COLUMN_NUMBER + ")";
         return new InstructionsListLoader(context, InstructionsEntry.CONTENT_LIST_URI, selection, selectionArgs, orderBy);
-    }
-
-    private InstructionsListLoader(Context context, Uri uri, String selection, String[] selectionArgs, String orderBy) {
-        super(context, uri, Query.PROJECTION, selection, selectionArgs, orderBy);
     }
 
     public interface Query {

@@ -21,10 +21,8 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract.RecipeEntry;
 import za.co.mikhails.nanodegree.icook.data.RecipeContract.SearchResultEntry;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    private static final String TAG = SyncAdapter.class.getSimpleName();
-
     public static final int PAGE_SIZE = 20;
-
+    private static final String TAG = SyncAdapter.class.getSimpleName();
     private static final String NEXT_PAGE = "nextpage";
     private static final String RECIPE_ID = "recipe_id";
     private static final String INSTRUCTIONS = "instructions";
@@ -40,8 +38,69 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         super(context, autoInitialize);
     }
 
-    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
+    public static void syncRecipeDetailsImmediately(Context context, long recipeId) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putLong(RECIPE_ID, recipeId);
+
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    public static void syncRecipeListImmediately(Context context, String query) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        if (query != null) {
+            bundle.putString(QUERY, query);
+        }
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    public static void syncRecipeListImmediately(Context context, Bundle query) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        if (query != null) {
+            bundle.putBoolean(QUERY_ADVANCED, true);
+            bundle.putAll(query);
+        }
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    public static void syncRecipeInstructionsImmediately(Context context, long recipeId) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putLong(RECIPE_ID, recipeId);
+        bundle.putBoolean(INSTRUCTIONS, true);
+
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    private static Account getSyncAccount(Context context) {
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        if (null == accountManager.getPassword(newAccount)) {
+            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
+                return null;
+            }
+            ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+        }
+        return newAccount;
+    }
+
+    public static void loadNextPageOnScroll(Context context) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        bundle.putBoolean(SyncAdapter.NEXT_PAGE, true);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
     }
 
     @Override
@@ -175,70 +234,5 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     resultList.toArray(new ContentValues[resultList.size()]));
         }
         return result;
-    }
-
-    public static void syncRecipeDetailsImmediately(Context context, long recipeId) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        bundle.putLong(RECIPE_ID, recipeId);
-
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
-
-    public static void syncRecipeListImmediately(Context context, String query) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        if (query != null) {
-            bundle.putString(QUERY, query);
-        }
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
-
-    public static void syncRecipeListImmediately(Context context, Bundle query) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        if (query != null) {
-            bundle.putBoolean(QUERY_ADVANCED, true);
-            bundle.putAll(query);
-        }
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
-
-    public static void syncRecipeInstructionsImmediately(Context context, long recipeId) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        bundle.putLong(RECIPE_ID, recipeId);
-        bundle.putBoolean(INSTRUCTIONS, true);
-
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
-    }
-
-    private static Account getSyncAccount(Context context) {
-        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
-
-        if (null == accountManager.getPassword(newAccount)) {
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
-            ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-        }
-        return newAccount;
-    }
-
-    public static void loadNextPageOnScroll(Context context) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        bundle.putBoolean(SyncAdapter.NEXT_PAGE, true);
-        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
     }
 }

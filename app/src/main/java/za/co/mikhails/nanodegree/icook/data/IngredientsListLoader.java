@@ -8,14 +8,14 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract.IngredientEntry;
 
 public class IngredientsListLoader extends CursorLoader {
 
+    private IngredientsListLoader(Context context, Uri uri, String selection, String[] selectionArgs) {
+        super(context, uri, Query.PROJECTION, selection, selectionArgs, null);
+    }
+
     public static IngredientsListLoader newInstanceForRecipeId(Context context, long recipeId) {
         String selection = IngredientEntry.COLUMN_RECIPE_ID + "=?";
         String[] selectionArgs = {String.valueOf(recipeId)};
         return new IngredientsListLoader(context, IngredientEntry.CONTENT_LIST_URI, selection, selectionArgs);
-    }
-
-    private IngredientsListLoader(Context context, Uri uri, String selection, String[] selectionArgs) {
-        super(context, uri, Query.PROJECTION, selection, selectionArgs, null);
     }
 
     public interface Query {

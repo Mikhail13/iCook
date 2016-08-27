@@ -8,12 +8,12 @@ import za.co.mikhails.nanodegree.icook.data.RecipeContract.SearchResultEntry;
 
 public class SearchResultLoader extends CursorLoader {
 
-    public static CursorLoader newLoaderInstance(Context context) {
-        return new SearchResultLoader(context, SearchResultEntry.buildUri());
-    }
-
     private SearchResultLoader(Context context, Uri uri) {
         super(context, uri, Query.PROJECTION, null, null, SearchResultEntry.COLUMN_KEY);
+    }
+
+    public static CursorLoader newLoaderInstance(Context context) {
+        return new SearchResultLoader(context, SearchResultEntry.buildUri());
     }
 
     public interface Query {
@@ -32,7 +32,6 @@ public class SearchResultLoader extends CursorLoader {
 
         int ID = 1;
         int TITLE = 2;
-        int IMAGE = 3;
         int IMAGE_TYPE = 4;
         int IMAGE_BASE_URL = 5;
         int CALORIES = 6;
