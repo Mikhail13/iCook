@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/ingredient_list_item_padding">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="@dimen/ingredient_list_image_width"
+        android:layout_height="@dimen/ingredient_list_image_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/list_item_ingredient_image_content_description"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/Base.TextAppearance.AppCompat.Inverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/ingredient_list_text_horizontal_margin"
+        android:layout_marginStart="@dimen/ingredient_list_text_horizontal_margin"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image" />
+
+    <TextView
+        android:id="@+id/secondary_text"
+        style="@style/Base.TextAppearance.AppCompat.Inverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_marginLeft="@dimen/ingredient_list_text_horizontal_margin"
+        android:layout_marginStart="@dimen/ingredient_list_text_horizontal_margin"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image" />
+
+</RelativeLayout>

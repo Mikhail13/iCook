@@ -38,17 +38,19 @@
             android:enabled="true"
             android:exported="false"
             android:syncable="true" />
+
         <provider
             android:name=".data.RecipeContentProvider"
             android:authorities="za.co.mikhails.nanodegree.icook.provider.recipe"
             android:enabled="true"
-            android:exported="false"
+            android:exported="true"
             android:syncable="true" />
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="za.co.mikhails.nanodegree.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
@@ -63,6 +65,7 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
         <service
             android:name=".spoonacular.ICookDbSyncService"
             android:exported="true">
@@ -84,6 +87,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".RecipeListActivity" />
         </activity>
+
         <activity
             android:name=".AdvancedSearchResultActivity"
             android:label="@string/advanced_search_label"
@@ -92,6 +96,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.AdvancedSearchActivity" />
         </activity>
+
         <activity
             android:name=".RecipeDetailsActivity"
             android:label="@string/title_activity_recipe_details"
@@ -101,6 +106,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
+
         <activity
             android:name=".FavoritesActivity"
             android:label="@string/title_activity_favorites_details"
@@ -109,6 +115,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
+
         <activity
             android:name=".ShoppingListActivity"
             android:label="@string/title_activity_shopping_list"
@@ -117,6 +124,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="za.co.mikhails.nanodegree.icook.RecipeListActivity" />
         </activity>
+
+        <receiver android:name=".widget.ShoppingListWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/shopping_list_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.ICookWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
     </application>
 
 </manifest>

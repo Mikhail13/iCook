@@ -73,5 +73,7 @@
     <string name="dialog_enter_ingredient_name">Enter ingredient name</string>
     <string name="list_item_ingredient_image_content_description">Ingredient image</string>
     <string name="list_item_recipe_image_content_description">Recipe image</string>
+    <string name="widget_title">iCook Shopping List</string>
+    <string name="widget_empty_list">Nothing in the list</string>
 
 </resources>
