@@ -50,6 +50,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/add_ingredient_to_shopping_list"
         app:srcCompat="@drawable/ic_add_shopping_cart_white" />
 
 </RelativeLayout>

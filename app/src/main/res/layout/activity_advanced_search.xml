@@ -60,8 +60,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -94,8 +94,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -128,8 +128,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -162,8 +162,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -220,6 +220,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/submit_button"
             android:onClick="searchSubmit"
             android:text="@string/advanced_search_submit" />
 

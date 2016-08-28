@@ -75,5 +75,8 @@
     <string name="list_item_recipe_image_content_description">Recipe image</string>
     <string name="widget_title">iCook Shopping List</string>
     <string name="widget_empty_list">Nothing in the list</string>
+    <string name="submit_button">Submit button</string>
+    <string name="add_to_favorites_floating_action_button">Add to favorites floating action button</string>
+    <string name="add_ingredient_to_shopping_list">Add ingredient to shopping list</string>
 
 </resources>
